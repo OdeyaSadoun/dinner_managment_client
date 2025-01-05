@@ -63,7 +63,6 @@ export default function ParticipantsView() {
                 is_reach_the_dinner: !participant.is_reach_the_dinner,
             };
 
-            // עדכון המשתתף בשרת
             await axios.put(`http://localhost:8000/person/${participant.id}`, updatedParticipant);
 
             const tableId = tableMapping[participant.table_number]; // קבלת table_id מהמיפוי
