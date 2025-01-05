@@ -35,27 +35,15 @@ export default function ParticipantsView() {
   }, []);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 250 },
-    { field: "name", headerName: "Name", width: 150 },
-    { field: "phone", headerName: "Phone", width: 150 },
-    { field: "table_number", headerName: "Table Number", width: 130 },
+    { field: "name", headerName: "שם", flex: 1 }, 
+    { field: "phone", headerName: "טלפון", flex: 1 },
+    { field: "table_number", headerName: "מספר שולחן", flex: 1 }, 
     {
       field: "is_reach_the_dinner",
-      headerName: "Reached Dinner",
-      width: 130,
+      headerName: "הגיע לדינר?",
+      flex: 1, 
       valueGetter: (params) => {
-        const value = params.row?.is_reach_the_dinner;
-        return value !== undefined ? (value ? "Yes" : "No") : "N/A";
-      },
-    },
-    { field: "is_active", headerName: "Active", width: 100 },
-    {
-      field: "date_created",
-      headerName: "Created At",
-      width: 200,
-      valueGetter: (params) => {
-        const value = params.row?.date_created;
-        return value ? new Date(value).toLocaleString() : "N/A";
+        return params !== null && params !== undefined ? (params ? "כן" : "לא") : "N/A";
       },
     },
   ];

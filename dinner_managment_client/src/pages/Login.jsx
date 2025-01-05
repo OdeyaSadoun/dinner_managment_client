@@ -17,20 +17,19 @@ export default function Login({ setUser }) {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    setError(""); // איפוס שגיאה
+    setError(""); 
     try {
       const response = await axios.post("http://localhost:8000/auth/login", {
         username,
         password,
       });
 
-      // בדיקת סטטוס התגובה
       if (response.data.status === "error") {
         setError(response.data.data["ERROR: "] || "Login failed");
       } else {
         const { data } = response.data;
-        setUser(data.username); // שמירת שם המשתמש
-        navigate("/home"); // מעבר לעמוד הראשי
+        setUser(data.username); 
+        navigate("/home"); 
       }
     } catch (err) {
       console.error(err);
