@@ -113,7 +113,7 @@ export default function TablesView() {
     );
 
     try {
-      await axios.put(`http://localhost:8000/table/${tableId}/position`, {
+      await axios.patch(`http://localhost:8000/table/position/${tableId}`, {
         position: newPosition,
       });
     } catch (error) {
