@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Container, Box, Button, Dialog, TextField, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+    Typography,
+    Container,
+    Box,
+    Button,
+    Dialog,
+    TextField,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+} from "@mui/material";
 import { styled } from "@mui/system";
 import axios from "axios";
 
@@ -18,16 +28,17 @@ const Table = styled(Box)(({ theme }) => ({
 }));
 
 // עיצוב לכיסא
-const Chair = styled(Box)(({ theme }) => ({
+const Chair = styled(Box)(({ theme, isOccupied }) => ({
     width: 30,
     height: 30,
-    backgroundColor: "#d1e7dd",
+    backgroundColor: isOccupied ? "#ffa726" : "#d1e7dd",
     borderRadius: "50%",
     border: "1px solid #000",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
+    cursor: isOccupied ? "pointer" : "default",
 }));
 
 export default function TablesView() {
@@ -35,6 +46,8 @@ export default function TablesView() {
     const [openDialog, setOpenDialog] = useState(false);
     const [chairs, setChairs] = useState(8);
     const [tableNumber, setTableNumber] = useState("");
+    const [selectedPerson, setSelectedPerson] = useState(null);
+    const [personDialogOpen, setPersonDialogOpen] = useState(false);
 
     // טעינת שולחנות מהשרת
     useEffect(() => {
@@ -139,6 +152,21 @@ export default function TablesView() {
         event.preventDefault();
     };
 
+    const handleChairClick = async (personId) => {
+        try {
+            const response = await axios.get(`http://localhost:8000/person/${personId}`);
+            setSelectedPerson(response.data.data);
+            setPersonDialogOpen(true);
+        } catch (error) {
+            console.error("Error fetching person details:", error);
+        }
+    };
+
+    const handlePersonDialogClose = () => {
+        setPersonDialogOpen(false);
+        setSelectedPerson(null);
+    };
+
     return (
         <Container maxWidth="lg" sx={{ mt: 8, height: "80vh", position: "relative" }}>
             <Typography variant="h4" align="center" gutterBottom>
@@ -147,9 +175,7 @@ export default function TablesView() {
             <Button
                 variant="contained"
                 color="primary"
-                onClick={() => {
-                    setOpenDialog(true);
-                }}
+                onClick={handleOpenDialog}
                 sx={{ mb: 2 }}
             >
                 הוסף שולחן
@@ -169,7 +195,7 @@ export default function TablesView() {
                 {tables.length > 0 ? (
                     tables.map((table) => (
                         <Table
-                            key={table.id} // וודא ש-id תקין
+                            key={table.id}
                             draggable
                             onDragStart={(e) => handleDragStart(e, table.id)}
                             sx={{
@@ -179,6 +205,7 @@ export default function TablesView() {
                         >
                             שולחן {table.table_number}
                             {Array.from({ length: table.chairs }).map((_, index) => {
+                                const person = table.people_list[index];
                                 const angle = (360 / table.chairs) * index;
                                 const radius = 60;
                                 const chairX = Math.cos((angle * Math.PI) / 180) * radius;
@@ -186,11 +213,13 @@ export default function TablesView() {
                                 return (
                                     <Chair
                                         key={`${table.id}-chair-${index}`}
+                                        isOccupied={!!person}
                                         sx={{
                                             left: `${50 + chairX}%`,
                                             top: `${50 + chairY}%`,
                                             transform: "translate(-50%, -50%)",
                                         }}
+                                        onClick={() => person && handleChairClick(person.id)}
                                     />
                                 );
                             })}
@@ -234,6 +263,23 @@ export default function TablesView() {
                     <Button onClick={handleAddTable} variant="contained" color="primary">
                         שמור
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={personDialogOpen} onClose={handlePersonDialogClose}>
+                <DialogTitle>פרטי משתתף</DialogTitle>
+                <DialogContent>
+                    {selectedPerson ? (
+                        <>
+                            <Typography>שם: {selectedPerson.name}</Typography>
+                            <Typography>טלפון: {selectedPerson.phone}</Typography>
+                        </>
+                    ) : (
+                        <Typography>טוען נתונים...</Typography>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handlePersonDialogClose}>סגור</Button>
                 </DialogActions>
             </Dialog>
         </Container>
