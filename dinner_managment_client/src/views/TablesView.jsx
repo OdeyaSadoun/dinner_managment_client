@@ -183,7 +183,7 @@ export default function TablesView() {
   const handleChairClick = async (personId) => {
     try {
       const response = await axios.get(`http://localhost:8000/person/${personId}`);
-      setSelectedPerson(response.data.data);
+      setSelectedPerson(response.data.data.person);
       setPersonDialogOpen(true);
     } catch (error) {
       console.error("Error fetching person details:", error);
@@ -247,7 +247,7 @@ export default function TablesView() {
                       top: `${50 + chairY}%`,
                       transform: "translate(-50%, -50%)",
                     }}
-                    onClick={() => person && handleChairClick(person.id)}
+                    onClick={() => person && handleChairClick(person)}
                   />
                 );
               })}

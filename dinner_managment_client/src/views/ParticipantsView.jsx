@@ -12,8 +12,8 @@ import axios from "axios";
 
 export default function ParticipantsView() {
     const [participants, setParticipants] = useState([]);
-    const [tables, setTables] = useState([]); // שמירת רשימת השולחנות
-    const [tableMapping, setTableMapping] = useState({}); // מיפוי בין table_number ל-table_id
+    const [tables, setTables] = useState([]); 
+    const [tableMapping, setTableMapping] = useState({}); 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
