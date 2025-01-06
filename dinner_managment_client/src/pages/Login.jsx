@@ -1,107 +1,73 @@
 import React, { useState } from "react";
-import {
-    Box,
-    TextField,
-    Button,
-    Typography,
-    Container,
-    Alert,
-} from "@mui/material";
+import { TextField, Button, Container, Box, Typography, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Login({ setUser }) {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-    // פונקציה לטיפול בהתחברות
-    const handleLogin = async () => {
-        setError(""); // איפוס הודעות שגיאה
-        try {
-            const response = await axios.post("http://localhost:8000/auth/login", {
-                username,
-                password,
-            });
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post("http://localhost:8000/auth/login", {
+        username,
+        password,
+      });
+      if (response.data.status === "success") {
+        const { username, token } = response.data.data;
 
-            if (response.data.status === "error") {
-                setError(response.data.data["ERROR: "] || "Login failed");
-            } else {
-                const { data } = response.data;
+        // שמירת שם משתמש וטוקן ב-Local Storage
+        localStorage.setItem("username", username);
+        localStorage.setItem("token", token);
 
-                // שמירת שם המשתמש ב-state וב-Local Storage
-                setUser(data.username);
-                localStorage.setItem("username", data.username);
-                localStorage.setItem("token", data.token)
+        setUser(username); // עדכון סטייט המשתמש
+        navigate("/home"); // מעבר לעמוד הבית
+      } else {
+        setError(response.data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred. Please try again.");
+    }
+  };
 
-                // ניווט לעמוד הבית
-                navigate("/home");
-            }
-        } catch (err) {
-            console.error(err);
-            setError("An unexpected error occurred. Please try again.");
-        }
-    };
+  return (
+    <Container maxWidth="sm">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          mt: 8,
+          p: 4,
+          boxShadow: 3,
+          borderRadius: 2,
+          backgroundColor: "#fff",
+        }}
+      >
+        <Typography variant="h4" align="center">
+          התחברות
+        </Typography>
 
-    React.useEffect(() => {
-        const storedUsername = localStorage.getItem("username");
-        if (storedUsername) {
-            setUser(storedUsername);
-            navigate("/home");
-        }
-    }, [navigate, setUser]);
+        {error && <Alert severity="error">{error}</Alert>}
 
-    return (
-        <Container maxWidth="sm" sx={{ mt: 8 }}>
-            <Box
-                component="form"
-                sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 2,
-                    backgroundColor: "#f9f9f9",
-                    p: 4,
-                    borderRadius: 2,
-                    boxShadow: 3,
-                }}
-            >
-                <Typography variant="h4" align="center" gutterBottom>
-                    התחברות
-                </Typography>
-
-                {error && (
-                    <Alert severity="error" onClose={() => setError("")}>
-                        {error}
-                    </Alert>
-                )}
-
-                <TextField
-                    label="שם משתמש"
-                    variant="outlined"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                />
-
-                <TextField
-                    label="סיסמה"
-                    type="password"
-                    variant="outlined"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleLogin}
-                    fullWidth
-                >
-                    התחבר
-                </Button>
-            </Box>
-        </Container>
-    );
+        <TextField
+          label="שם משתמש"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <TextField
+          label="סיסמה"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button variant="contained" color="primary" onClick={handleLogin}>
+          התחבר
+        </Button>
+      </Box>
+    </Container>
+  );
 }

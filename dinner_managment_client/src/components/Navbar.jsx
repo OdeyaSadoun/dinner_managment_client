@@ -1,49 +1,37 @@
-import React, { useState } from "react";
-import { Tabs, Tab, AppBar, Toolbar, Button } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import React from "react";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar({ user, setUser }) {
-  const location = useLocation(); // לקבלת הנתיב הנוכחי
-  const [value, setValue] = useState(() => {
-    // הגדר ערך התחלתי על בסיס הנתיב
-    switch (location.pathname) {
-      case "/home":
-        return 0;
-      case "/tables":
-        return 1;
-      case "/participants":
-        return 2;
-      default:
-        return 0;
-    }
-  });
+  const navigate = useNavigate();
 
-  // שינוי הטאב הפעיל
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleLogout = () => {
+    localStorage.removeItem("username");
+    localStorage.removeItem("token");
+    setUser(""); 
+    navigate("/login"); 
   };
 
   return (
-    <AppBar position="static">
-      <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          textColor="inherit"
-          indicatorColor="secondary"
-        >
-          <Tab label="עמוד הבית" component={Link} to="/home" />
-          <Tab label="שולחנות" component={Link} to="/tables" />
-          <Tab label="משתתפים" component={Link} to="/participants" />
-        </Tabs>
-        <Button
-          color="inherit"
-          onClick={() => {
-            setUser(""); // איפוס שם המשתמש
-            localStorage.removeItem("username"); // מחיקת שם המשתמש מ-Local Storage
-            localStorage.removeItem("token"); // מחיקת שם המשתמש מ-Local Storage
-          }}
-        >
+    <AppBar position="static" sx={{ backgroundColor: "#333" }}>
+      <Toolbar>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          מערכת לניהול דינר
+        </Typography>
+
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button color="inherit" component={Link} to="/home">
+            בית
+          </Button>
+          <Button color="inherit" component={Link} to="/tables">
+            שולחנות
+          </Button>
+          <Button color="inherit" component={Link} to="/participants">
+            משתתפים
+          </Button>
+        </Box>
+
+        <Button color="inherit" onClick={handleLogout}>
           התנתק
         </Button>
       </Toolbar>

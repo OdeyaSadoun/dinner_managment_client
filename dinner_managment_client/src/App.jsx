@@ -1,34 +1,64 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import TablesView from "./views/TablesView";
-import ParticipantsView from "./views/ParticipantsView";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Navbar from "./components/Navbar"; // ייבוא ה-Navbar
+import Navbar from "./components/Navbar"; // Navbar שמיובא
+import Home from "./pages/Home"; // עמוד הבית
+import Login from "./pages/Login"; // עמוד ההתחברות
+import TablesView from "./views/TablesView"; // תצוגת השולחנות
+import ParticipantsView from "./views/ParticipantsView"; // תצוגת המשתתפים
 import { Box } from "@mui/material";
+import axios from "axios"; // נדרשת לשימוש ב-updateTables
 
 export default function App() {
   const [user, setUser] = useState(() => localStorage.getItem("username") || ""); // אחזור שם משתמש מ-Local Storage
+  const [tables, setTables] = useState([]); // הגדרת ה-state לשולחנות
+
+  const updateTables = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:8000/table", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status === "success" && Array.isArray(response.data.data.tables)) {
+        setTables(response.data.data.tables);
+      }
+    } catch (error) {
+      console.error("Error updating tables:", error);
+    }
+  };
 
   return (
     <Router>
       <Box>
-        {/* הצגת Navbar אם המשתמש מחובר */}
         {user && <Navbar user={user} setUser={setUser} />}
 
         <Routes>
-          {/* אם המשתמש לא מחובר, העברה אוטומטית לעמוד Login */}
           <Route
             path="/home"
             element={user ? <Home user={user} /> : <Navigate to="/login" />}
           />
           <Route
             path="/tables"
-            element={user ? <TablesView /> : <Navigate to="/login" />}
+            element={
+              user ? (
+                <TablesView tables={tables} setTables={setTables} updateTables={updateTables} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
           <Route
             path="/participants"
-            element={user ? <ParticipantsView /> : <Navigate to="/login" />}
+            element={
+              user ? (
+                <ParticipantsView
+                  tables={tables}
+                  setTables={setTables}
+                  updateTables={updateTables}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
           <Route
             path="/login"

@@ -13,6 +13,7 @@ import {
 import { styled } from "@mui/system";
 import axios from "axios";
 
+// עיצוב לשולחן
 const Table = styled(Box)(({ theme }) => ({
   width: 100,
   height: 100,
@@ -26,6 +27,7 @@ const Table = styled(Box)(({ theme }) => ({
   position: "absolute",
 }));
 
+// עיצוב לכיסא
 const Chair = styled(Box)(({ theme, isOccupied }) => ({
   width: 30,
   height: 30,
@@ -47,6 +49,7 @@ export default function TablesView() {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [personDialogOpen, setPersonDialogOpen] = useState(false);
 
+  // טעינת שולחנות מהשרת
   useEffect(() => {
     const fetchTables = async () => {
       try {
@@ -85,14 +88,33 @@ export default function TablesView() {
     }
 
     const newTable = {
+      people_list: [],
       position: { x: 50, y: 50 },
       chairs,
-      people_list: [],
       table_number: tableNumber,
     };
 
     try {
-      const response = await axios.post("http://localhost:8000/table", newTable);
+      console.log("check");
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token not found. Please login again.");
+      }
+      console.log({ newTable });
+
+      const response = await axios.post("http://localhost:8000/table", 
+        {
+          people_list: [],
+          position: { x: 50, y: 50 },
+          chairs,
+          table_number: tableNumber, 
+        }, 
+        {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.data.status === "success") {
         setTables((prev) => [
           ...prev,
@@ -137,13 +159,12 @@ export default function TablesView() {
     );
 
     try {
-      // קבלת הטוקן מה-localStorage
       const token = localStorage.getItem("token");
-
-      // שליחת הבקשה עם הטוקן
-      await axios.patch(
-        `http://localhost:8000/table/position/${tableId}`,
-        { position: newPosition },
+      if (!token) {
+        throw new Error("Token not found. Please login again.");
+      } await axios.patch(`http://localhost:8000/table/position/${tableId}`, {
+        position: newPosition,
+      },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -155,17 +176,14 @@ export default function TablesView() {
     }
   };
 
-
   const handleDragOver = (event) => {
     event.preventDefault();
   };
 
   const handleChairClick = async (personId) => {
     try {
-      console.log({ personId });
-
       const response = await axios.get(`http://localhost:8000/person/${personId}`);
-      setSelectedPerson(response.data.data.person);
+      setSelectedPerson(response.data.data);
       setPersonDialogOpen(true);
     } catch (error) {
       console.error("Error fetching person details:", error);
@@ -229,10 +247,10 @@ export default function TablesView() {
                       top: `${50 + chairY}%`,
                       transform: "translate(-50%, -50%)",
                     }}
+                    onClick={() => person && handleChairClick(person.id)}
                   />
                 );
               })}
-
             </Table>
           ))
         ) : (
