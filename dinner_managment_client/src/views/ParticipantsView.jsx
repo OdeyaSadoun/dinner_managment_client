@@ -12,8 +12,8 @@ import axios from "axios";
 
 export default function ParticipantsView() {
     const [participants, setParticipants] = useState([]);
-    const [tables, setTables] = useState([]); // שמירת רשימת השולחנות
-    const [tableMapping, setTableMapping] = useState({}); // מיפוי בין table_number ל-table_id
+    const [tables, setTables] = useState([]); 
+    const [tableMapping, setTableMapping] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -24,12 +24,11 @@ export default function ParticipantsView() {
                 if (response.data.status === "success" && Array.isArray(response.data.data.tables)) {
                     setTables(response.data.data.tables);
 
-                    // יצירת מיפוי בין table_number ל-table_id
                     const mapping = response.data.data.tables.reduce((acc, table) => {
                         acc[table.table_number] = table.id;
                         return acc;
                     }, {});
-                    setTableMapping(mapping); // שמירת המיפוי בסטייט
+                    setTableMapping(mapping);
                 }
             } catch (error) {
                 console.error("Error fetching tables:", error);
@@ -56,49 +55,69 @@ export default function ParticipantsView() {
         fetchParticipants();
     }, []);
 
+    const updateTables = async () => {
+        try {
+            const response = await axios.get("http://localhost:8000/table");
+            if (response.data.status === "success" && Array.isArray(response.data.data.tables)) {
+                setTables(response.data.data.tables);
+            } else {
+                console.error("Failed to update tables. Response status not successful.");
+            }
+        } catch (error) {
+            console.error("Error updating tables:", error);
+        }
+    };
+
     const handleCheckboxChange = async (participant) => {
         try {
             const updatedParticipant = {
                 ...participant,
                 is_reach_the_dinner: !participant.is_reach_the_dinner,
             };
-
-            await axios.put(`http://localhost:8000/person/${participant.id}`, updatedParticipant);
-
-            const tableId = tableMapping[participant.table_number]; // קבלת table_id מהמיפוי
-
-            if (updatedParticipant.is_reach_the_dinner) {
-                // הוספת משתתף לשולחן
-                if (tableId) {
-                    await axios.patch(`http://localhost:8000/table/add_person/${tableId}`, {
-                        person_id: participant.id,
-                    });
-                } else {
-                    console.error("Table ID not found for table number:", participant.table_number);
-                }
-            } else {
-                // הסרת משתתף מהשולחן
-                if (tableId) {
-                    await axios.patch(`http://localhost:8000/table/remove_person/${tableId}`, {
-                        person_id: participant.id,
-                    });
-
-                    // עדכון השולחנות לאחר הסרה
-                    await updateTables();
-                } else {
-                    console.error("Table ID not found for table number:", participant.table_number);
-                }
+    
+            const tableId = tableMapping[participant.table_number];
+    
+            if (!tableId) {
+                console.error("Table ID not found for table number:", participant.table_number);
+                alert("Failed to find table ID. Please try again.");
+                return;
             }
-
-            // עדכון ה-UI של המשתתפים
+    
+            // שליחת בקשה לשרת
+            if (updatedParticipant.is_reach_the_dinner) {
+                await axios.patch(`http://localhost:8000/person/seat/${participant.id}`, {
+                    table_id: tableId,
+                });
+            } else {
+                await axios.patch(`http://localhost:8000/person/unseat/${participant.id}`, {
+                    table_id: tableId,
+                });
+            }
+    
+            // עדכון סטייט של המשתתפים
             setParticipants((prev) =>
                 prev.map((p) => (p.id === participant.id ? updatedParticipant : p))
+            );
+    
+            // עדכון סטייט של השולחנות
+            setTables((prev) =>
+                prev.map((table) =>
+                    table.id === tableId
+                        ? {
+                              ...table,
+                              people_list: updatedParticipant.is_reach_the_dinner
+                                  ? [...table.people_list, participant]
+                                  : table.people_list.filter((p) => p.id !== participant.id),
+                          }
+                        : table
+                )
             );
         } catch (error) {
             console.error("Error updating participant or table:", error);
             alert("Failed to update participant. Please try again.");
         }
     };
+    
 
     const columns = [
         { field: "name", headerName: "שם", flex: 1 },

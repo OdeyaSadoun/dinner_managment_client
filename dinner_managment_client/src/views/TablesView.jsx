@@ -13,7 +13,6 @@ import {
 import { styled } from "@mui/system";
 import axios from "axios";
 
-// עיצוב לשולחן
 const Table = styled(Box)(({ theme }) => ({
   width: 100,
   height: 100,
@@ -27,7 +26,6 @@ const Table = styled(Box)(({ theme }) => ({
   position: "absolute",
 }));
 
-// עיצוב לכיסא
 const Chair = styled(Box)(({ theme, isOccupied }) => ({
   width: 30,
   height: 30,
@@ -139,13 +137,24 @@ export default function TablesView() {
     );
 
     try {
-      await axios.patch(`http://localhost:8000/table/position/${tableId}`, {
-        position: newPosition,
-      });
+      // קבלת הטוקן מה-localStorage
+      const token = localStorage.getItem("token");
+
+      // שליחת הבקשה עם הטוקן
+      await axios.patch(
+        `http://localhost:8000/table/position/${tableId}`,
+        { position: newPosition },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
     } catch (error) {
       console.error("Error updating table position:", error);
     }
   };
+
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -153,9 +162,9 @@ export default function TablesView() {
 
   const handleChairClick = async (personId) => {
     try {
-        console.log({personId});
-        
-      const response = await axios.get(`http://localhost:8000/person/${personId}`);      
+      console.log({ personId });
+
+      const response = await axios.get(`http://localhost:8000/person/${personId}`);
       setSelectedPerson(response.data.data.person);
       setPersonDialogOpen(true);
     } catch (error) {
@@ -220,10 +229,10 @@ export default function TablesView() {
                       top: `${50 + chairY}%`,
                       transform: "translate(-50%, -50%)",
                     }}
-                    onClick={() => person && handleChairClick(person)}
                   />
                 );
               })}
+
             </Table>
           ))
         ) : (
