@@ -7,6 +7,8 @@ import TablesView from "./views/TablesView"; // תצוגת השולחנות
 import ParticipantsView from "./views/ParticipantsView"; // תצוגת המשתתפים
 import { Box } from "@mui/material";
 import axios from "axios"; // נדרשת לשימוש ב-updateTables
+import isAdmin from "./utils/auth";
+import UsersManagement from "./views/UsersManagement";
 
 export default function App() {
   const [user, setUser] = useState(() => localStorage.getItem("username") || ""); // אחזור שם משתמש מ-Local Storage
@@ -65,6 +67,10 @@ export default function App() {
             element={
               user ? <Navigate to="/home" /> : <Login setUser={setUser} />
             }
+          />
+          <Route
+            path="/users"
+            element={isAdmin() ? <UsersManagement /> : <Navigate to="/home" />}
           />
           <Route
             path="*"

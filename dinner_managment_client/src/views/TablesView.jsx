@@ -103,18 +103,18 @@ export default function TablesView() {
       }
       console.log({ newTable });
 
-      const response = await axios.post("http://localhost:8000/table", 
+      const response = await axios.post("http://localhost:8000/table",
         {
           people_list: [],
           position: { x: 50, y: 50 },
           chairs,
-          table_number: tableNumber, 
-        }, 
-        {
-        headers: {
-          Authorization: `Bearer ${token}`,
+          table_number: tableNumber,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       if (response.data.status === "success") {
         setTables((prev) => [
           ...prev,
