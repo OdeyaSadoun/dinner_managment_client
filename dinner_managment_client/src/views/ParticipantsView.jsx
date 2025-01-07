@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
+import isAdmin from "../utils/auth";
 
 export default function ParticipantsView() {
     const [participants, setParticipants] = useState([]);
@@ -30,6 +31,8 @@ export default function ParticipantsView() {
         table_number: "",
         is_reach_the_dinner: false
     });
+
+    const admin = isAdmin()
 
     useEffect(() => {
         const fetchTables = async () => {
@@ -120,7 +123,7 @@ export default function ParticipantsView() {
                 }
             );
 
-            if (response.data.status === "success") {              
+            if (response.data.status === "success") {
                 setParticipants((prev) => [...prev, response.data.data]);
                 setNewParticipant({ name: "", phone: "", table_number: "" });
                 handleCloseDialog();
@@ -133,10 +136,76 @@ export default function ParticipantsView() {
         }
     };
 
+    const handlePrintLabel = (participant) => {
+        const printContent = `
+            <div>
+                <h3>${participant.name}</h3>
+                <p>טלפון: ${participant.phone}</p>
+                <p>מספר שולחן: ${participant.table_number}</p>
+            </div>
+        `;
+        const printWindow = window.open("", "_blank");
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.print();
+    };
+
+    const handleDeleteParticipant = async (id) => {
+        try {
+            const token = localStorage.getItem("token"); // קבלת הטוקן מה-localStorage
+            if (!token) {
+                throw new Error("No authentication token found");
+            }
+
+            await axios.patch(`http://localhost:8000/person/delete/${id}`,
+                {}
+                , {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // הוספת טוקן לבקשה
+                    },
+                });
+
+            setParticipants((prev) => prev.filter((participant) => participant.id !== id));
+        } catch (error) {
+            console.error("Error deleting participant:", error);
+            alert("Failed to delete participant. Please try again.");
+        }
+    };
+
+    const handleEditParticipant = (participant) => {
+        setNewParticipant({
+            ...participant,
+            id: participant.id || participant._id,
+        });
+        setOpen(true); // פותח את הדיאלוג לעריכה
+    };
+
+    const handleSaveEdit = async () => {
+        try {
+            const updatedParticipant = { ...newParticipant };
+            const token = localStorage.getItem("token");
+            await axios.put(`http://localhost:8000/person/${updatedParticipant.id}`, { person: updatedParticipant }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setParticipants((prev) =>
+                prev.map((participant) =>
+                    participant.id === updatedParticipant.id ? updatedParticipant : participant
+                )
+            );
+            handleCloseDialog(); // סגירת הדיאלוג לאחר השמירה
+        } catch (error) {
+            console.error("Error updating participant:", error);
+            alert("Failed to update participant. Please try again.");
+        }
+    };
+
+
     const columns = [
-        { field: "name", headerName: "שם", flex: 1 },
-        { field: "phone", headerName: "טלפון", flex: 1 },
-        { field: "table_number", headerName: "מספר שולחן", flex: 1 },
+        { field: "name", headerName: "שם", flex: 1, editable: admin }, // עריכה רק למנהלים
+        { field: "phone", headerName: "טלפון", flex: 1, editable: admin }, // עריכה רק למנהלים
+        { field: "table_number", headerName: "מספר שולחן", flex: 1, editable: admin }, // עריכה רק למנהלים
         {
             field: "is_reach_the_dinner",
             headerName: "הגיע לדינר?",
@@ -145,10 +214,50 @@ export default function ParticipantsView() {
                 <Checkbox
                     checked={params.row.is_reach_the_dinner || false}
                     onChange={() => handleCheckboxChange(params.row)}
+                    disabled={!isAdmin} // לא ניתן לשנות אם לא מנהל
                 />
             ),
         },
+        {
+            field: "print",
+            headerName: "הדפס פתקית",
+            flex: 1,
+            renderCell: (params) => (
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => handlePrintLabel(params.row)}
+                >
+                    הדפס
+                </Button>
+            ),
+        },
+        {
+            field: "actions",
+            headerName: "פעולות",
+            flex: 1,
+            renderCell: (params) =>
+                admin ? ( // הצגת פעולות רק למנהלים
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                        <Button
+                            variant="outlined"
+                            color="secondary"
+                            onClick={() => handleEditParticipant(params.row)}
+                        >
+                            ערוך
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={() => handleDeleteParticipant(params.row.id || params.row._id)}
+                        >
+                            מחק
+                        </Button>
+                    </Box>
+                ) : null,
+        },
     ];
+
 
     return (
         <Container maxWidth="lg" sx={{ mt: 8, minHeight: "80vh" }}>
@@ -186,7 +295,7 @@ export default function ParticipantsView() {
             )}
 
             <Dialog open={open} onClose={handleCloseDialog}>
-                <DialogTitle>הוסף משתתף</DialogTitle>
+                <DialogTitle>{newParticipant.id ? "ערוך משתתף" : "הוסף משתתף"}</DialogTitle>
                 <DialogContent>
                     <TextField
                         label="שם"
@@ -220,11 +329,15 @@ export default function ParticipantsView() {
                     <Button onClick={handleCloseDialog} color="secondary">
                         ביטול
                     </Button>
-                    <Button onClick={handleAddParticipant} color="primary">
-                        הוסף
+                    <Button
+                        onClick={newParticipant.id ? handleSaveEdit : handleAddParticipant}
+                        color="primary"
+                    >
+                        {newParticipant.id ? "שמור" : "הוסף"}
                     </Button>
                 </DialogActions>
             </Dialog>
+
         </Container>
     );
 }
