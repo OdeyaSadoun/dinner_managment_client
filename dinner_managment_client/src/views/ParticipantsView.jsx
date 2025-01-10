@@ -305,7 +305,7 @@ export default function ParticipantsView() {
                     color="primary"
                     onClick={handleOpenDialog}
                     sx={{
-                        alignSelf: "flex-end", // למקם בקצה הימני
+                        alignSelf: "flex-end",
                     }}
                 >
                     הוסף משתתף
