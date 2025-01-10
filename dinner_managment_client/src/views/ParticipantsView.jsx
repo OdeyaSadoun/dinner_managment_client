@@ -103,6 +103,7 @@ export default function ParticipantsView() {
     };
 
     const handleOpenDialog = () => setOpen(true);
+
     const handleCloseDialog = () => setOpen(false);
 
     const handleAddParticipant = async () => {
@@ -177,23 +178,37 @@ export default function ParticipantsView() {
             ...participant,
             id: participant.id || participant._id,
         });
-        setOpen(true); // פותח את הדיאלוג לעריכה
+        setOpen(true);
     };
 
     const handleSaveEdit = async () => {
         try {
             const updatedParticipant = { ...newParticipant };
+            console.log({ updatedParticipant });
+
             const token = localStorage.getItem("token");
-            await axios.put(`http://localhost:8000/person/${updatedParticipant.id}`, { person: updatedParticipant }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
+            const response = await axios.put(`http://localhost:8000/person/${updatedParticipant.id}`,
+                {
+                    id: updatedParticipant.id,
+                    name: updatedParticipant.name,
+                    phone: updatedParticipant.phone,
+                    table_number: updatedParticipant.table_number,
+                    is_reach_the_dinner: updatedParticipant.is_reach_the_dinner,
+                    date_created: updatedParticipant.date_created,
+                    is_active: updatedParticipant.is_active
                 },
-            });
-            setParticipants((prev) =>
-                prev.map((participant) =>
-                    participant.id === updatedParticipant.id ? updatedParticipant : participant
-                )
-            );
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+            if (response.data.status === "success") {
+                setParticipants((prev) =>
+                    prev.map((participant) =>
+                        participant.id === updatedParticipant.id ? updatedParticipant : participant
+                    )
+                );
+            }
             handleCloseDialog(); // סגירת הדיאלוג לאחר השמירה
         } catch (error) {
             console.error("Error updating participant:", error);
@@ -237,7 +252,7 @@ export default function ParticipantsView() {
             headerName: "פעולות",
             flex: 1,
             renderCell: (params) =>
-                admin ? ( // הצגת פעולות רק למנהלים
+                admin ? (
                     <Box sx={{ display: "flex", gap: 1 }}>
                         <Button
                             variant="outlined"
@@ -283,10 +298,13 @@ export default function ParticipantsView() {
                     {error}
                 </Alert>
             ) : (
-                <Box sx={{ height: 500, mt: 4 }}>
+                <Box sx={{ height: 500, mt: 4, direction: "rtl" }}>
                     <DataGrid
                         rows={participants}
-                        columns={columns}
+                        columns={columns.map((column) => ({
+                            ...column,
+                            align: "right", 
+                        }))}
                         pageSize={5}
                         rowsPerPageOptions={[5, 10, 20]}
                         getRowId={(row) => row.id || row._id}
