@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
+import SearchBar from "../components/SearchBar";
 import isAdmin from "../utils/auth";
 
 export default function ParticipantsView() {
@@ -23,8 +24,8 @@ export default function ParticipantsView() {
     const [tableMapping, setTableMapping] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const [open, setOpen] = useState(false);
+    const [filteredParticipants, setFilteredParticipants] = useState([]);
     const [newParticipant, setNewParticipant] = useState({
         name: "",
         phone: "",
@@ -102,6 +103,10 @@ export default function ParticipantsView() {
         }
     };
 
+    const handleSearch = (filteredData) => {
+        setFilteredParticipants(filteredData);
+    };
+
     const handleOpenDialog = () => setOpen(true);
 
     const handleCloseDialog = () => setOpen(false);
@@ -153,7 +158,7 @@ export default function ParticipantsView() {
 
     const handleDeleteParticipant = async (id) => {
         try {
-            const token = localStorage.getItem("token"); // קבלת הטוקן מה-localStorage
+            const token = localStorage.getItem("token");
             if (!token) {
                 throw new Error("No authentication token found");
             }
@@ -162,7 +167,7 @@ export default function ParticipantsView() {
                 {}
                 , {
                     headers: {
-                        Authorization: `Bearer ${token}`, // הוספת טוקן לבקשה
+                        Authorization: `Bearer ${token}`,
                     },
                 });
 
@@ -216,11 +221,11 @@ export default function ParticipantsView() {
         }
     };
 
-
     const columns = [
-        { field: "name", headerName: "שם", flex: 1, editable: admin }, // עריכה רק למנהלים
-        { field: "phone", headerName: "טלפון", flex: 1, editable: admin }, // עריכה רק למנהלים
-        { field: "table_number", headerName: "מספר שולחן", flex: 1, editable: admin }, // עריכה רק למנהלים
+
+        { field: "name", headerName: "שם", flex: 1, editable: admin },
+        { field: "phone", headerName: "טלפון", flex: 1, editable: admin },
+        { field: "table_number", headerName: "מספר שולחן", flex: 1, editable: admin },
         {
             field: "is_reach_the_dinner",
             headerName: "הגיע לדינר?",
@@ -229,7 +234,7 @@ export default function ParticipantsView() {
                 <Checkbox
                     checked={params.row.is_reach_the_dinner || false}
                     onChange={() => handleCheckboxChange(params.row)}
-                    disabled={!isAdmin} // לא ניתן לשנות אם לא מנהל
+                    disabled={!isAdmin}
                 />
             ),
         },
@@ -253,7 +258,15 @@ export default function ParticipantsView() {
             flex: 1,
             renderCell: (params) =>
                 admin ? (
-                    <Box sx={{ display: "flex", gap: 1 }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center", // מרכז את הכפתורים אופקית
+                            alignItems: "center", // מרכז את הכפתורים אנכית
+                            gap: 1, // מרווח בין הכפתורים
+                            height: "100%", // מוודא התאמה מלאה לגובה התא
+                        }}
+                    >
                         <Button
                             variant="outlined"
                             color="secondary"
@@ -273,21 +286,34 @@ export default function ParticipantsView() {
         },
     ];
 
-
     return (
         <Container maxWidth="lg" sx={{ mt: 8, minHeight: "80vh" }}>
             <Typography variant="h4" align="center" gutterBottom>
                 משתתפים בדינר
             </Typography>
-
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleOpenDialog}
-                sx={{ mb: 2 }}
-            >
-                הוסף משתתף
-            </Button>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+                <SearchBar
+                    data={participants}
+                    onSearch={handleSearch}
+                    searchBy={[
+                        (participant) => participant.name,
+                        (participant) => participant.phone,
+                    ]}
+                />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpenDialog}
+                    sx={{
+                        borderRadius: 4, // פינות מעוגלות לכפתור
+                        height: "40px", // גובה סטנדרטי
+                        width: "150px", // רוחב סטנדרטי
+                        alignSelf: "flex-end", // למקם בקצה הימני
+                    }}
+                >
+                    הוסף משתתף
+                </Button>
+            </Box>
 
             {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
@@ -297,20 +323,31 @@ export default function ParticipantsView() {
                 <Alert severity="error" sx={{ mt: 4 }}>
                     {error}
                 </Alert>
+            ) : filteredParticipants.length === 0 && participants.length > 0 ? (
+                <Box sx={{ mt: 4, textAlign: "center" }}>
+                    <Typography variant="h6" color="text.secondary">
+                        לא נמצאו תוצאות.
+                    </Typography>
+                </Box>
             ) : (
-                <Box sx={{ height: 500, mt: 4, direction: "rtl" }}>
+                <Box
+                    sx={{
+                        height: "calc(100vh - 250px)", // גובה הטבלה
+                    }}
+                >
                     <DataGrid
-                        rows={participants}
+                        rows={filteredParticipants.length > 0 ? filteredParticipants : participants} // הצגת הנתונים
                         columns={columns.map((column) => ({
                             ...column,
-                            align: "right", 
+                            align: "center", // יישור תוכן הטבלה
                         }))}
-                        pageSize={5}
-                        rowsPerPageOptions={[5, 10, 20]}
+                        pageSize={10}
+                        rowsPerPageOptions={[10, 20, 50]}
                         getRowId={(row) => row.id || row._id}
                     />
                 </Box>
             )}
+
 
             <Dialog open={open} onClose={handleCloseDialog}>
                 <DialogTitle>{newParticipant.id ? "ערוך משתתף" : "הוסף משתתף"}</DialogTitle>
