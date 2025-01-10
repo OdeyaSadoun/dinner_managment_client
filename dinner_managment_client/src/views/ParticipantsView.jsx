@@ -305,9 +305,6 @@ export default function ParticipantsView() {
                     color="primary"
                     onClick={handleOpenDialog}
                     sx={{
-                        borderRadius: 4, // פינות מעוגלות לכפתור
-                        height: "40px", // גובה סטנדרטי
-                        width: "150px", // רוחב סטנדרטי
                         alignSelf: "flex-end", // למקם בקצה הימני
                     }}
                 >

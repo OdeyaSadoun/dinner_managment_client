@@ -25,7 +25,7 @@ const SearchBar = ({ data, onSearch, searchBy }) => {
   };
 
   return (
-<Paper sx={{ boxShadow: 'none', paddingBottom: 3, paddingTop: 3 }}>
+<Paper sx={{ boxShadow: 'none' }}>
   <TextField
     variant="outlined"
     fullWidth
