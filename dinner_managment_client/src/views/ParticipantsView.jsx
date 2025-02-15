@@ -73,6 +73,14 @@ export default function ParticipantsView() {
         fetchParticipants();
     }, []);
 
+    useEffect(() => {
+        if (participants.length > 0) {
+            setFilteredParticipants(participants);
+            setLoading(false); // רק עכשיו מסיימים את הטעינה
+        }
+    }, [participants]);
+
+
     const handleCheckboxChange = async (participant) => {
         try {
             const updatedParticipant = {
@@ -104,7 +112,7 @@ export default function ParticipantsView() {
     };
 
     const handleSearch = (filteredData) => {
-        setFilteredParticipants(filteredData);
+        setFilteredParticipants(filteredData.length > 0 ? filteredData : participants);
     };
 
     const handleOpenDialog = () => setOpen(true);
@@ -320,23 +328,19 @@ export default function ParticipantsView() {
                 <Alert severity="error" sx={{ mt: 4 }}>
                     {error}
                 </Alert>
-            ) : filteredParticipants.length === 0 && participants.length > 0 ? (
+            ) : filteredParticipants.length === 0 && participants.length === 0 ? ( // שינוי התנאי כאן
                 <Box sx={{ mt: 4, textAlign: "center" }}>
                     <Typography variant="h6" color="text.secondary">
                         לא נמצאו תוצאות.
                     </Typography>
                 </Box>
             ) : (
-                <Box
-                    sx={{
-                        height: "calc(100vh - 250px)", // גובה הטבלה
-                    }}
-                >
+                <Box sx={{ height: "calc(100vh - 250px)" }}>
                     <DataGrid
-                        rows={filteredParticipants.length > 0 ? filteredParticipants : participants} // הצגת הנתונים
+                        rows={filteredParticipants}
                         columns={columns.map((column) => ({
                             ...column,
-                            align: "center", // יישור תוכן הטבלה
+                            align: "center",
                         }))}
                         pageSize={10}
                         rowsPerPageOptions={[10, 20, 50]}
