@@ -13,33 +13,9 @@ import {
 import { styled } from "@mui/system";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
+import Table from "../style/Table";
+import Chair from "../style/Chair";
 
-const Table = styled(Box)(({ shape, gender }) => ({
-  width: shape === "rectangle" ? 140 : shape === "square" ? 100 : 100,
-  height: shape === "rectangle" ? 80 : 100,
-  backgroundColor: gender === "male" ? "#ADD8E6" : "#FFB6C1", // תכלת לזכר, ורוד לנקבה
-  borderRadius: shape === "circle" ? "50%" : "10px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  border: "2px solid #000",
-  cursor: "grab",
-  position: "absolute",
-}));
-
-// עיצוב לכיסא
-const Chair = styled(Box)(({ theme, isOccupied }) => ({
-  width: 30,
-  height: 30,
-  backgroundColor: isOccupied ? "#ffa726" : "#d1e7dd",
-  borderRadius: "50%",
-  border: "1px solid #000",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  position: "absolute",
-  cursor: isOccupied ? "pointer" : "default",
-}));
 
 export default function TablesView() {
   const [tables, setTables] = useState([]);
