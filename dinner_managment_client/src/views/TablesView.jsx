@@ -14,10 +14,10 @@ import { styled } from "@mui/system";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 
-const Table = styled(Box)(({ shape }) => ({
+const Table = styled(Box)(({ shape, gender }) => ({
   width: shape === "rectangle" ? 140 : shape === "square" ? 100 : 100,
   height: shape === "rectangle" ? 80 : 100,
-  backgroundColor: "#f5f5f5",
+  backgroundColor: gender === "male" ? "#ADD8E6" : "#FFB6C1", // תכלת לזכר, ורוד לנקבה
   borderRadius: shape === "circle" ? "50%" : "10px",
   display: "flex",
   alignItems: "center",
@@ -255,8 +255,9 @@ export default function TablesView() {
             <Table
               key={table.id}
               shape={table.shape}
-              draggable // הופך את האלמנט לגריר
-              onDragStart={(e) => handleDragStart(e, table.id)} // מאפשר לגרור
+              gender={table.gender} // הוספת פרמטר gender כדי לשנות את הצבע
+              draggable
+              onDragStart={(e) => handleDragStart(e, table.id)}
               sx={{
                 left: table.position?.x || 0,
                 top: table.position?.y || 0,
@@ -268,7 +269,7 @@ export default function TablesView() {
               }}
             >
               <Typography variant="h6" align="center">
-                שולחן {table.table_number} ({table.gender === "male" ? "זכר" : "נקבה"})
+                שולחן {table.table_number}
               </Typography>
               <DeleteIcon
                 onClick={() => confirmDeleteTable(table.id)} // שינוי הפונקציה לפתיחת הדיאלוג במקום למחוק מיד
