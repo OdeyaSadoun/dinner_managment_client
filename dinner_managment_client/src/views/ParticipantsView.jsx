@@ -26,6 +26,8 @@ export default function ParticipantsView() {
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
     const [filteredParticipants, setFilteredParticipants] = useState([]);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [participantToDelete, setParticipantToDelete] = useState(null);
     const [newParticipant, setNewParticipant] = useState({
         name: "",
         phone: "",
@@ -111,6 +113,11 @@ export default function ParticipantsView() {
         }
     };
 
+    const confirmDeleteParticipant = (id) => {
+        setParticipantToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
     const handleSearch = (filteredData) => {
         setFilteredParticipants(filteredData.length > 0 ? filteredData : participants);
     };
@@ -164,25 +171,27 @@ export default function ParticipantsView() {
         printWindow.print();
     };
 
-    const handleDeleteParticipant = async (id) => {
+    const handleDeleteParticipant = async () => {
+        if (!participantToDelete) return;
         try {
             const token = localStorage.getItem("token");
             if (!token) {
                 throw new Error("No authentication token found");
             }
 
-            await axios.patch(`http://localhost:8000/person/delete/${id}`,
-                {}
-                , {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+            await axios.patch(`http://localhost:8000/person/delete/${participantToDelete}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
-            setParticipants((prev) => prev.filter((participant) => participant.id !== id));
+            setParticipants((prev) => prev.filter((participant) => participant.id !== participantToDelete));
         } catch (error) {
             console.error("Error deleting participant:", error);
             alert("Failed to delete participant. Please try again.");
+        } finally {
+            setDeleteDialogOpen(false);
+            setParticipantToDelete(null);
         }
     };
 
@@ -285,7 +294,7 @@ export default function ParticipantsView() {
                         <Button
                             variant="outlined"
                             color="error"
-                            onClick={() => handleDeleteParticipant(params.row.id || params.row._id)}
+                            onClick={() => confirmDeleteParticipant(params.row.id || params.row._id)} // שינוי כאן
                         >
                             מחק
                         </Button>
@@ -393,7 +402,20 @@ export default function ParticipantsView() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+                <DialogTitle>אישור מחיקת משתתף</DialogTitle>
+                <DialogContent>
+                    <Typography>האם אתה בטוח שברצונך למחוק משתתף זה?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
+                        ביטול
+                    </Button>
+                    <Button onClick={handleDeleteParticipant} color="error" variant="contained">
+                        מחק
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }

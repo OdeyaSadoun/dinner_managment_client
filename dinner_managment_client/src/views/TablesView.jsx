@@ -366,7 +366,7 @@ export default function TablesView() {
       >
         <DialogTitle>אישור מחיקת שולחן</DialogTitle>
         <DialogContent>
-          <Typography>האם אתה בטוח שברצונך למחוק את השולחן? פעולה זו אינה הפיכה.</Typography>
+          <Typography>האם אתה בטוח שברצונך למחוק את השולחן?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
