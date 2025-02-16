@@ -7,6 +7,7 @@ import DeleteDialog from "../components/dialogs/DeleteDialog";
 import AddTableDialog from "../components/dialogs/AddTableDialog";
 import TablesLayout from "../components/layouts/TablesLayout";
 
+
 export default function TablesView() {
   const { tables, setTables } = useTablesData();
   const { handleDragStart, handleDrop, handleDragOver } = useDragAndDrop(tables, setTables);
@@ -23,7 +24,6 @@ export default function TablesView() {
         confirmDeleteTable={tableActions.confirmDeleteTable}
         handleChairClick={tableActions.handleChairClick}
       />
-
       <AddTableDialog
         open={tableActions.openDialog}
         onClose={tableActions.handleCloseDialog}
@@ -37,7 +37,6 @@ export default function TablesView() {
         tableGender={tableActions.tableGender}
         setTableGender={tableActions.setTableGender}
       />
-
       <DeleteDialog
         open={tableActions.deleteDialogOpen}
         onClose={() => tableActions.setDeleteDialogOpen(false)}
@@ -47,7 +46,6 @@ export default function TablesView() {
         confirmText="מחק"
         cancelText="ביטול"
       />
-
     </Container>
   );
 }
