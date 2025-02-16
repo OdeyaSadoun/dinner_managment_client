@@ -15,6 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import Table from "../style/Table";
 import Chair from "../style/Chair";
+import DeleteDialog from "../components/dialogs/DeleteDialog";
 
 
 export default function TablesView() {
@@ -369,24 +370,15 @@ export default function TablesView() {
         </DialogActions>
       </Dialog>
 
-      <Dialog
+      <DeleteDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-      >
-        <DialogTitle>אישור מחיקת שולחן</DialogTitle>
-        <DialogContent>
-          <Typography>האם אתה בטוח שברצונך למחוק את השולחן?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
-            ביטול
-          </Button>
-          <Button onClick={handleDeleteTable} color="error" variant="contained">
-            מחק
-          </Button>
-        </DialogActions>
-      </Dialog>
-
+        onConfirm={handleDeleteTable}
+        title="אישור מחיקת שולחן"
+        message="האם אתה בטוח שברצונך למחוק את השולחן?"
+        confirmText="מחק"
+        cancelText="ביטול"
+      />
     </Container>
   );
 }
