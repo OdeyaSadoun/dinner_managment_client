@@ -1,221 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Container } from "@mui/material";
-import axios from "axios";
+import useTablesData from "../hooks/useTablesData";
+import useDragAndDrop from "../hooks/useDragAndDrop";
+import useTableActions from "../hooks/useTableActions";
 import DeleteDialog from "../components/dialogs/DeleteDialog";
 import AddTableDialog from "../components/dialogs/AddTableDialog";
 import TablesLayout from "../components/layouts/TablesLayout";
 
-
 export default function TablesView() {
-  const [tables, setTables] = useState([]);
-  const [tableGender, setTableGender] = useState("male"); // ברירת מחדל: זכר
-  const [openDialog, setOpenDialog] = useState(false);
-  const [chairs, setChairs] = useState(8);
-  const [tableShape, setTableShape] = useState("circle"); // ברירת מחדל: עיגול
-  const [tableNumber, setTableNumber] = useState("");
-  const [selectedPerson, setSelectedPerson] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [tableToDelete, setTableToDelete] = useState(null);
-  const [personDialogOpen, setPersonDialogOpen] = useState(false);
-
-  useEffect(() => {
-    const fetchTables = async () => {
-      try {
-        const response = await axios.get("http://localhost:8000/table");
-        if (
-          response.data.status === "success" &&
-          Array.isArray(response.data.data.tables)
-        ) {
-          setTables(response.data.data.tables);
-        } else {
-          setTables([]);
-        }
-      } catch (error) {
-        console.error("Error fetching tables:", error);
-        setTables([]);
-      }
-    };
-
-    fetchTables();
-  }, []);
-
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
-
-  const confirmDeleteTable = (tableId) => {
-    setTableToDelete(tableId);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setChairs(8);
-    setTableNumber("");
-  };
-
-  const handleAddTable = async () => {
-    if (!tableNumber) {
-      alert("יש להזין מספר שולחן.");
-      return;
-    }
-
-    const newTable = {
-      people_list: [],
-      position: { x: 50, y: 50 },
-      chairs,
-      table_number: tableNumber,
-      shape: tableShape,
-      gender: tableGender, 
-    };
-
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Token not found. Please login again.");
-      }
-
-      const response = await axios.post("http://localhost:8000/table", newTable, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.data.status === "success") {
-        setTables((prev) => [
-          ...prev,
-          { ...newTable, id: response.data.data.inserted_id },
-        ]);
-        handleCloseDialog();
-      }
-    } catch (error) {
-      console.error("Error adding new table:", error);
-    }
-  };
-
-  const handleDragStart = (event, tableId) => {
-    const { clientX, clientY } = event;
-    event.dataTransfer.setData(
-      "text/plain",
-      JSON.stringify({ tableId, offsetX: clientX, offsetY: clientY })
-    );
-  };
-
-  const handleDrop = async (event) => {
-    event.preventDefault();
-    const data = JSON.parse(event.dataTransfer.getData("text/plain"));
-    const { tableId, offsetX, offsetY } = data;
-    const { clientX, clientY } = event;
-
-    const table = tables.find((t) => t.id === tableId);
-    if (!table || !table.position) {
-      console.error("Invalid table or position data");
-      return;
-    }
-
-    const newPosition = {
-      x: clientX - (offsetX - table.position.x),
-      y: clientY - (offsetY - table.position.y),
-    };
-
-    setTables((prev) =>
-      prev.map((t) =>
-        t.id === tableId ? { ...t, position: newPosition } : t
-      )
-    );
-
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Token not found. Please login again.");
-      } await axios.patch(`http://localhost:8000/table/position/${tableId}`, {
-        position: newPosition,
-      },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error updating table position:", error);
-    }
-  };
-
-  const handleDragOver = (event) => {
-    event.preventDefault();
-  };
-
-  const handleChairClick = async (personId) => {
-    try {
-      const response = await axios.get(`http://localhost:8000/person/${personId}`);
-      setSelectedPerson(response.data.data.person);
-      setPersonDialogOpen(true);
-    } catch (error) {
-      console.error("Error fetching person details:", error);
-    }
-  };
-
-  const handleDeleteTable = async () => {
-    if (!tableToDelete) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
-      await axios.patch(`http://localhost:8000/table/delete/${tableToDelete}`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setTables((prev) => prev.filter((table) => table.id !== tableToDelete));
-
-      alert("השולחן נמחק בהצלחה!"); // התראה על מחיקה מוצלחת
-    } catch (error) {
-      console.error("Error deleting table:", error);
-      alert("Failed to delete table. Please try again.");
-    } finally {
-      setDeleteDialogOpen(false);
-      setTableToDelete(null);
-    }
-  };
+  const { tables, setTables } = useTablesData();
+  const { handleDragStart, handleDrop, handleDragOver } = useDragAndDrop(tables, setTables);
+  const tableActions = useTableActions(setTables);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 8, height: "80vh", position: "relative" }}>
       <TablesLayout
         tables={tables}
-        handleOpenDialog={handleOpenDialog}
+        handleOpenDialog={tableActions.handleOpenDialog}
         handleDragStart={handleDragStart}
         handleDragOver={handleDragOver}
         handleDrop={handleDrop}
-        confirmDeleteTable={confirmDeleteTable}
-        handleChairClick={handleChairClick}
+        confirmDeleteTable={tableActions.confirmDeleteTable}
+        handleChairClick={tableActions.handleChairClick}
       />
+
       <AddTableDialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        onConfirm={handleAddTable}
-        tableNumber={tableNumber}
-        setTableNumber={setTableNumber}
-        chairs={chairs}
-        setChairs={setChairs}
-        tableShape={tableShape}
-        setTableShape={setTableShape}
-        tableGender={tableGender}
-        setTableGender={setTableGender}
+        open={tableActions.openDialog}
+        onClose={tableActions.handleCloseDialog}
+        onConfirm={tableActions.handleAddTable}
+        tableNumber={tableActions.tableNumber} 
+        setTableNumber={tableActions.setTableNumber} 
+        chairs={tableActions.chairs} 
+        setChairs={tableActions.setChairs}
+        tableShape={tableActions.tableShape}
+        setTableShape={tableActions.setTableShape}
+        tableGender={tableActions.tableGender}
+        setTableGender={tableActions.setTableGender}
       />
+
       <DeleteDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={handleDeleteTable}
+        open={tableActions.deleteDialogOpen}
+        onClose={() => tableActions.setDeleteDialogOpen(false)}
+        onConfirm={tableActions.handleDeleteTable}
         title="אישור מחיקת שולחן"
         message="האם אתה בטוח שברצונך למחוק את השולחן?"
         confirmText="מחק"
         cancelText="ביטול"
       />
+
     </Container>
   );
 }
