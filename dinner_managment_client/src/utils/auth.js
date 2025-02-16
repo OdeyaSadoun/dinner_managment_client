@@ -6,7 +6,7 @@ const isAdmin = () => {
 
   try {
     const decoded = jwtDecode(token);
-    return decoded.role === "admin"; // Adjust based on your JWT structure
+    return decoded.role === "admin"; 
   } catch (error) {
     console.error("Error decoding token:", error);
     return false;

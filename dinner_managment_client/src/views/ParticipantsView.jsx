@@ -17,6 +17,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import SearchBar from "../components/SearchBar";
 import isAdmin from "../utils/auth";
+import DeleteDialog from "../components/dialogs/DeleteDialog";
 
 export default function ParticipantsView() {
     const [participants, setParticipants] = useState([]);
@@ -402,20 +403,15 @@ export default function ParticipantsView() {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-                <DialogTitle>אישור מחיקת משתתף</DialogTitle>
-                <DialogContent>
-                    <Typography>האם אתה בטוח שברצונך למחוק משתתף זה?</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
-                        ביטול
-                    </Button>
-                    <Button onClick={handleDeleteParticipant} color="error" variant="contained">
-                        מחק
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <DeleteDialog
+                open={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+                onConfirm={handleDeleteParticipant}
+                title="אישור מחיקת משתתף"
+                message="האם אתה בטוח שברצונך למחוק משתתף זה?"
+                confirmText="מחק"
+                cancelText="ביטול"
+            />
         </Container>
     );
 }
