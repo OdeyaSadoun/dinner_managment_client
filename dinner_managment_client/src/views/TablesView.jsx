@@ -16,6 +16,7 @@ import axios from "axios";
 import Table from "../style/Table";
 import Chair from "../style/Chair";
 import DeleteDialog from "../components/dialogs/DeleteDialog";
+import AddTableDialog from "../components/dialogs/AddTableDialog";
 
 
 export default function TablesView() {
@@ -298,78 +299,19 @@ export default function TablesView() {
           </Typography>
         )}
       </Box>
-
-      <Dialog
+      <AddTableDialog
         open={openDialog}
         onClose={handleCloseDialog}
-        aria-labelledby="add-table-dialog-title"
-        aria-describedby="add-table-dialog-description"
-      >
-        <DialogTitle id="add-table-dialog-title">הוסף שולחן חדש</DialogTitle>
-        <DialogContent id="add-table-dialog-description">
-          <TextField
-            autoFocus
-            margin="dense"
-            label="מספר שולחן"
-            type="number"
-            fullWidth
-            value={tableNumber}
-            onChange={(e) => setTableNumber(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="כמות כיסאות"
-            type="number"
-            fullWidth
-            value={chairs}
-            onChange={(e) => setChairs(Number(e.target.value))}
-          />
-          <Typography sx={{ mt: 2 }}>בחר סוג שולחן:</Typography>
-          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-            <Button
-              variant={tableShape === "circle" ? "contained" : "outlined"}
-              onClick={() => setTableShape("circle")}
-            >
-              עיגול
-            </Button>
-            <Button
-              variant={tableShape === "square" ? "contained" : "outlined"}
-              onClick={() => setTableShape("square")}
-            >
-              ריבוע
-            </Button>
-            <Button
-              variant={tableShape === "rectangle" ? "contained" : "outlined"}
-              onClick={() => setTableShape("rectangle")}
-            >
-              מלבן
-            </Button>
-          </Box>
-          <Typography sx={{ mt: 2 }}>בחר מגדר:</Typography>
-          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-            <Button
-              variant={tableGender === "male" ? "contained" : "outlined"}
-              onClick={() => setTableGender("male")}
-            >
-              גברים
-            </Button>
-            <Button
-              variant={tableGender === "female" ? "contained" : "outlined"}
-              onClick={() => setTableGender("female")}
-            >
-              נשים
-            </Button>
-          </Box>
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>ביטול</Button>
-          <Button onClick={handleAddTable} variant="contained" color="primary">
-            שמור
-          </Button>
-        </DialogActions>
-      </Dialog>
-
+        onConfirm={handleAddTable}
+        tableNumber={tableNumber}
+        setTableNumber={setTableNumber}
+        chairs={chairs}
+        setChairs={setChairs}
+        tableShape={tableShape}
+        setTableShape={setTableShape}
+        tableGender={tableGender}
+        setTableGender={setTableGender}
+      />
       <DeleteDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
