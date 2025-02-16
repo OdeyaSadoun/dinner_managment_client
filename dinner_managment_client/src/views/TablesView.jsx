@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Typography,
-  Container,
-  Box,
-  Button,
-  Dialog,
-  TextField,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
-import { styled } from "@mui/system";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Container } from "@mui/material";
 import axios from "axios";
 import DeleteDialog from "../components/dialogs/DeleteDialog";
 import AddTableDialog from "../components/dialogs/AddTableDialog";
@@ -30,7 +18,6 @@ export default function TablesView() {
   const [tableToDelete, setTableToDelete] = useState(null);
   const [personDialogOpen, setPersonDialogOpen] = useState(false);
 
-  // טעינת שולחנות מהשרת
   useEffect(() => {
     const fetchTables = async () => {
       try {
@@ -78,10 +65,9 @@ export default function TablesView() {
       position: { x: 50, y: 50 },
       chairs,
       table_number: tableNumber,
-      shape: tableShape, // הוספת סוג השולחן
-      gender: tableGender, // הוספת מגדר
+      shape: tableShape,
+      gender: tableGender, 
     };
-
 
     try {
       const token = localStorage.getItem("token");
@@ -195,11 +181,6 @@ export default function TablesView() {
       setDeleteDialogOpen(false);
       setTableToDelete(null);
     }
-  };
-
-  const handlePersonDialogClose = () => {
-    setPersonDialogOpen(false);
-    setSelectedPerson(null);
   };
 
   return (
