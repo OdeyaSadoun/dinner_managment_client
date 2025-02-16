@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 
 // עיצוב לשולחן
@@ -47,6 +48,8 @@ export default function TablesView() {
   const [chairs, setChairs] = useState(8);
   const [tableNumber, setTableNumber] = useState("");
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [tableToDelete, setTableToDelete] = useState(null);
   const [personDialogOpen, setPersonDialogOpen] = useState(false);
 
   // טעינת שולחנות מהשרת
@@ -73,6 +76,11 @@ export default function TablesView() {
 
   const handleOpenDialog = () => {
     setOpenDialog(true);
+  };
+
+  const confirmDeleteTable = (tableId) => {
+    setTableToDelete(tableId);
+    setDeleteDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
@@ -190,6 +198,33 @@ export default function TablesView() {
     }
   };
 
+  const handleDeleteTable = async () => {
+    if (!tableToDelete) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      await axios.patch(`http://localhost:8000/table/delete/${tableToDelete}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setTables((prev) => prev.filter((table) => table.id !== tableToDelete));
+
+      alert("השולחן נמחק בהצלחה!"); // התראה על מחיקה מוצלחת
+    } catch (error) {
+      console.error("Error deleting table:", error);
+      alert("Failed to delete table. Please try again.");
+    } finally {
+      setDeleteDialogOpen(false);
+      setTableToDelete(null);
+    }
+  };
+
   const handlePersonDialogClose = () => {
     setPersonDialogOpen(false);
     setSelectedPerson(null);
@@ -229,15 +264,45 @@ export default function TablesView() {
               sx={{
                 left: table.position?.x || 0,
                 top: table.position?.y || 0,
+                position: "absolute",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              שולחן {table.table_number}
+              <Typography variant="h6" align="center">
+                שולחן {table.table_number}
+              </Typography>
+
+              <DeleteIcon
+                onClick={() => confirmDeleteTable(table.id)} // שינוי הפונקציה לפתיחת הדיאלוג במקום למחוק מיד
+                sx={{
+                  position: "absolute",
+                  top: "-20px",
+                  right: "-20px",
+                  backgroundColor: "white",
+                  borderRadius: "50%",
+                  padding: "4px",
+                  color: "red",
+                  fontSize: 28,
+                  cursor: "pointer",
+                  zIndex: 10,
+                  "&:hover": {
+                    color: "darkred",
+                  },
+                }}
+              />
+
+
+              {/* כיסאות מסביב לשולחן */}
               {Array.from({ length: table.chairs }).map((_, index) => {
                 const person = table.people_list[index];
                 const angle = (360 / table.chairs) * index;
                 const radius = 60;
                 const chairX = Math.cos((angle * Math.PI) / 180) * radius;
                 const chairY = Math.sin((angle * Math.PI) / 180) * radius;
+
                 return (
                   <Chair
                     key={`${table.id}-chair-${index}`}
@@ -252,6 +317,7 @@ export default function TablesView() {
                 );
               })}
             </Table>
+
           ))
         ) : (
           <Typography align="center" sx={{ mt: 4 }}>
@@ -294,22 +360,24 @@ export default function TablesView() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={personDialogOpen} onClose={handlePersonDialogClose}>
-        <DialogTitle>פרטי משתתף</DialogTitle>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>אישור מחיקת שולחן</DialogTitle>
         <DialogContent>
-          {selectedPerson ? (
-            <>
-              <Typography>שם: {selectedPerson.name}</Typography>
-              <Typography>טלפון: {selectedPerson.phone}</Typography>
-            </>
-          ) : (
-            <Typography>טוען נתונים...</Typography>
-          )}
+          <Typography>האם אתה בטוח שברצונך למחוק את השולחן? פעולה זו אינה הפיכה.</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handlePersonDialogClose}>סגור</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="secondary">
+            ביטול
+          </Button>
+          <Button onClick={handleDeleteTable} color="error" variant="contained">
+            מחק
+          </Button>
         </DialogActions>
       </Dialog>
+
     </Container>
   );
 }
