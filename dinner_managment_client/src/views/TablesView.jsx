@@ -14,12 +14,11 @@ import { styled } from "@mui/system";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 
-// עיצוב לשולחן
-const Table = styled(Box)(({ theme }) => ({
-  width: 100,
-  height: 100,
+const Table = styled(Box)(({ shape }) => ({
+  width: shape === "rectangle" ? 140 : shape === "square" ? 100 : 100,
+  height: shape === "rectangle" ? 80 : 100,
   backgroundColor: "#f5f5f5",
-  borderRadius: "50%",
+  borderRadius: shape === "circle" ? "50%" : "10px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -44,8 +43,10 @@ const Chair = styled(Box)(({ theme, isOccupied }) => ({
 
 export default function TablesView() {
   const [tables, setTables] = useState([]);
+  const [tableGender, setTableGender] = useState("male"); // ברירת מחדל: זכר
   const [openDialog, setOpenDialog] = useState(false);
   const [chairs, setChairs] = useState(8);
+  const [tableShape, setTableShape] = useState("circle"); // ברירת מחדל: עיגול
   const [tableNumber, setTableNumber] = useState("");
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -100,29 +101,23 @@ export default function TablesView() {
       position: { x: 50, y: 50 },
       chairs,
       table_number: tableNumber,
+      shape: tableShape, // הוספת סוג השולחן
+      gender: tableGender, // הוספת מגדר
     };
 
-    try {
-      console.log("check");
 
+    try {
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("Token not found. Please login again.");
       }
-      console.log({ newTable });
 
-      const response = await axios.post("http://localhost:8000/table",
-        {
-          people_list: [],
-          position: { x: 50, y: 50 },
-          chairs,
-          table_number: tableNumber,
+      const response = await axios.post("http://localhost:8000/table", newTable, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      });
+
       if (response.data.status === "success") {
         setTables((prev) => [
           ...prev,
@@ -259,8 +254,9 @@ export default function TablesView() {
           tables.map((table) => (
             <Table
               key={table.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, table.id)}
+              shape={table.shape}
+              draggable // הופך את האלמנט לגריר
+              onDragStart={(e) => handleDragStart(e, table.id)} // מאפשר לגרור
               sx={{
                 left: table.position?.x || 0,
                 top: table.position?.y || 0,
@@ -272,9 +268,8 @@ export default function TablesView() {
               }}
             >
               <Typography variant="h6" align="center">
-                שולחן {table.table_number}
+                שולחן {table.table_number} ({table.gender === "male" ? "זכר" : "נקבה"})
               </Typography>
-
               <DeleteIcon
                 onClick={() => confirmDeleteTable(table.id)} // שינוי הפונקציה לפתיחת הדיאלוג במקום למחוק מיד
                 sx={{
@@ -351,7 +346,44 @@ export default function TablesView() {
             value={chairs}
             onChange={(e) => setChairs(Number(e.target.value))}
           />
+          <Typography sx={{ mt: 2 }}>בחר סוג שולחן:</Typography>
+          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <Button
+              variant={tableShape === "circle" ? "contained" : "outlined"}
+              onClick={() => setTableShape("circle")}
+            >
+              עיגול
+            </Button>
+            <Button
+              variant={tableShape === "square" ? "contained" : "outlined"}
+              onClick={() => setTableShape("square")}
+            >
+              ריבוע
+            </Button>
+            <Button
+              variant={tableShape === "rectangle" ? "contained" : "outlined"}
+              onClick={() => setTableShape("rectangle")}
+            >
+              מלבן
+            </Button>
+          </Box>
+          <Typography sx={{ mt: 2 }}>בחר מגדר:</Typography>
+          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <Button
+              variant={tableGender === "male" ? "contained" : "outlined"}
+              onClick={() => setTableGender("male")}
+            >
+              גברים
+            </Button>
+            <Button
+              variant={tableGender === "female" ? "contained" : "outlined"}
+              onClick={() => setTableGender("female")}
+            >
+              נשים
+            </Button>
+          </Box>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={handleCloseDialog}>ביטול</Button>
           <Button onClick={handleAddTable} variant="contained" color="primary">
