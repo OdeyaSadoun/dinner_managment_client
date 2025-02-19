@@ -251,72 +251,6 @@ export default function ParticipantsView() {
         }
     };
 
-
-    const columns = [
-
-        { field: "name", headerName: "שם", flex: 1, editable: admin },
-        { field: "phone", headerName: "טלפון", flex: 1, editable: admin },
-        { field: "table_number", headerName: "מספר שולחן", flex: 1, editable: admin },
-        {
-            field: "is_reach_the_dinner",
-            headerName: "הגיע לדינר?",
-            flex: 1,
-            renderCell: (params) => (
-                <Checkbox
-                    checked={params.row.is_reach_the_dinner || false}
-                    onChange={() => handleCheckboxChange(params.row)}
-                    disabled={!isAdmin}
-                />
-            ),
-        },
-        {
-            field: "print",
-            headerName: "הדפס פתקית",
-            flex: 1,
-            renderCell: (params) => (
-                <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handlePrintLabel(params.row)}
-                >
-                    הדפס
-                </Button>
-            ),
-        },
-        {
-            field: "actions",
-            headerName: "פעולות",
-            flex: 1,
-            renderCell: (params) =>
-                admin ? (
-                    <Box
-                        sx={{
-                            display: "flex",
-                            justifyContent: "center", // מרכז את הכפתורים אופקית
-                            alignItems: "center", // מרכז את הכפתורים אנכית
-                            gap: 1, // מרווח בין הכפתורים
-                            height: "100%", // מוודא התאמה מלאה לגובה התא
-                        }}
-                    >
-                        <Button
-                            variant="outlined"
-                            color="secondary"
-                            onClick={() => handleEditParticipant(params.row)}
-                        >
-                            ערוך
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            onClick={() => confirmDeleteParticipant(params.row.id || params.row._id)} // שינוי כאן
-                        >
-                            מחק
-                        </Button>
-                    </Box>
-                ) : null,
-        },
-    ];
-
     return (
         <Container maxWidth="lg" sx={{ mt: 8, minHeight: "80vh" }}>
             <ParticipantsTable
@@ -326,7 +260,11 @@ export default function ParticipantsView() {
                 error={error}
                 handleSearch={handleSearch}
                 handleOpenDialog={handleOpenDialog}
-                columns={columns}
+                admin={admin}
+                handleCheckboxChange={handleCheckboxChange}
+                handlePrintLabel={handlePrintLabel}
+                handleEditParticipant={handleEditParticipant}
+                confirmDeleteParticipant={confirmDeleteParticipant}
             />
 
             <AddAndEditParticipantDialog

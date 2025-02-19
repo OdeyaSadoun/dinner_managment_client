@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography, Button, CircularProgress, Alert } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import SearchBar from "../layouts/SearchBar";
+import getParticipantsColumns from "./ParticipantsColumns";
 
 const ParticipantsTable = ({
   participants,
@@ -10,8 +11,20 @@ const ParticipantsTable = ({
   error,
   handleSearch,
   handleOpenDialog,
-  columns,
+  admin,
+  handleCheckboxChange,
+  handlePrintLabel,
+  handleEditParticipant,
+  confirmDeleteParticipant,
 }) => {
+  const columns = getParticipantsColumns({
+    admin,
+    handleCheckboxChange,
+    handlePrintLabel,
+    handleEditParticipant,
+    confirmDeleteParticipant,
+  });
+
   return (
     <>
       <Typography variant="h4" align="center" gutterBottom>
@@ -27,15 +40,9 @@ const ParticipantsTable = ({
             (participant) => participant.phone,
           ]}
         />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleOpenDialog} // תוקן!
-          sx={{ alignSelf: "flex-end" }}
-        >
+        <Button variant="contained" color="primary" onClick={handleOpenDialog} sx={{ alignSelf: "flex-end" }}>
           הוסף משתתף
         </Button>
-
       </Box>
 
       {loading ? (
