@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Navbar from "./components/Navbar"; // Navbar שמיובא
+import Navbar from "./components/layouts/Navbar";
 import Home from "./pages/Home"; // עמוד הבית
 import Login from "./pages/Login"; // עמוד ההתחברות
 import TablesView from "./views/TablesView"; // תצוגת השולחנות

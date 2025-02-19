@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
-import SearchBar from "../components/SearchBar";
+import SearchBar from "../components/layouts/SearchBar";
 import isAdmin from "../utils/auth";
 
 export default function UsersView() {

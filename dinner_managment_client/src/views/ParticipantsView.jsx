@@ -1,23 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
     Box,
-    Typography,
-    CircularProgress,
-    Alert,
     Container,
     Checkbox,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    TextField,
+    Button
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
-import SearchBar from "../components/SearchBar";
 import isAdmin from "../utils/auth";
 import DeleteDialog from "../components/dialogs/DeleteDialog";
+import AddAndEditParticipantDialog from "../components/dialogs/AddAndEditParticipantDialog";
+import ParticipantsTable from "../components/tables/ParticipantsTable";
+
 
 export default function ParticipantsView() {
     const [participants, setParticipants] = useState([]);
@@ -33,7 +26,10 @@ export default function ParticipantsView() {
         name: "",
         phone: "",
         table_number: "",
-        is_reach_the_dinner: false
+        is_reach_the_dinner: false,
+        gender: "male",
+        contact_person: "",
+        add_manual: false
     });
 
     const admin = isAdmin()
@@ -137,6 +133,9 @@ export default function ParticipantsView() {
                     phone: newParticipant.phone,
                     table_number: newParticipant.table_number,
                     is_reach_the_dinner: newParticipant.is_reach_the_dinner,
+                    gender: newParticipant.gender,
+                    contact_person: newParticipant.contact_person,
+                    add_manual: newParticipant.add_manual
                 },
                 {
                     headers: {
@@ -147,7 +146,15 @@ export default function ParticipantsView() {
 
             if (response.data.status === "success") {
                 setParticipants((prev) => [...prev, response.data.data]);
-                setNewParticipant({ name: "", phone: "", table_number: "" });
+                setNewParticipant({
+                    name: "",
+                    phone: "",
+                    table_number: "",
+                    is_reach_the_dinner: false,
+                    gender: "male",
+                    contact_person: "",
+                    add_manual: false
+                });
                 handleCloseDialog();
             } else {
                 alert("Failed to add participant.");
@@ -157,6 +164,7 @@ export default function ParticipantsView() {
             alert("An error occurred while adding the participant.");
         }
     };
+
 
     const handlePrintLabel = (participant) => {
         const printContent = `
@@ -197,6 +205,8 @@ export default function ParticipantsView() {
     };
 
     const handleEditParticipant = (participant) => {
+        console.log(participant);
+
         setNewParticipant({
             ...participant,
             id: participant.id || participant._id,
@@ -207,7 +217,7 @@ export default function ParticipantsView() {
     const handleSaveEdit = async () => {
         try {
             const updatedParticipant = { ...newParticipant };
-            console.log({ updatedParticipant });
+            console.log(updatedParticipant);
 
             const token = localStorage.getItem("token");
             const response = await axios.put(`http://localhost:8000/person/${updatedParticipant.id}`,
@@ -217,14 +227,16 @@ export default function ParticipantsView() {
                     phone: updatedParticipant.phone,
                     table_number: updatedParticipant.table_number,
                     is_reach_the_dinner: updatedParticipant.is_reach_the_dinner,
-                    date_created: updatedParticipant.date_created,
-                    is_active: updatedParticipant.is_active
+                    gender: updatedParticipant.gender,
+                    contact_person: updatedParticipant.contact_person,
+                    add_manual: updatedParticipant.add_manual
                 },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+
             if (response.data.status === "success") {
                 setParticipants((prev) =>
                     prev.map((participant) =>
@@ -238,6 +250,7 @@ export default function ParticipantsView() {
             alert("Failed to update participant. Please try again.");
         }
     };
+
 
     const columns = [
 
@@ -306,103 +319,24 @@ export default function ParticipantsView() {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 8, minHeight: "80vh" }}>
-            <Typography variant="h4" align="center" gutterBottom>
-                משתתפים בדינר
-            </Typography>
-            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-                <SearchBar
-                    data={participants}
-                    onSearch={handleSearch}
-                    searchBy={[
-                        (participant) => participant.name,
-                        (participant) => participant.phone,
-                    ]}
-                />
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleOpenDialog}
-                    sx={{
-                        alignSelf: "flex-end",
-                    }}
-                >
-                    הוסף משתתף
-                </Button>
-            </Box>
+            <ParticipantsTable
+                participants={participants}
+                filteredParticipants={filteredParticipants}
+                loading={loading}
+                error={error}
+                handleSearch={handleSearch}
+                handleOpenDialog={handleOpenDialog}
+                columns={columns}
+            />
 
-            {loading ? (
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-                    <CircularProgress />
-                </Box>
-            ) : error ? (
-                <Alert severity="error" sx={{ mt: 4 }}>
-                    {error}
-                </Alert>
-            ) : filteredParticipants.length === 0 && participants.length === 0 ? ( // שינוי התנאי כאן
-                <Box sx={{ mt: 4, textAlign: "center" }}>
-                    <Typography variant="h6" color="text.secondary">
-                        לא נמצאו תוצאות.
-                    </Typography>
-                </Box>
-            ) : (
-                <Box sx={{ height: "calc(100vh - 250px)" }}>
-                    <DataGrid
-                        rows={filteredParticipants}
-                        columns={columns.map((column) => ({
-                            ...column,
-                            align: "center",
-                        }))}
-                        pageSize={10}
-                        rowsPerPageOptions={[10, 20, 50]}
-                        getRowId={(row) => row.id || row._id}
-                    />
-                </Box>
-            )}
+            <AddAndEditParticipantDialog
+                open={open}
+                onClose={handleCloseDialog}
+                newParticipant={newParticipant}
+                setNewParticipant={setNewParticipant}
+                onSave={newParticipant.id ? handleSaveEdit : handleAddParticipant}
+            />
 
-
-            <Dialog open={open} onClose={handleCloseDialog}>
-                <DialogTitle>{newParticipant.id ? "ערוך משתתף" : "הוסף משתתף"}</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="שם"
-                        value={newParticipant.name}
-                        onChange={(e) =>
-                            setNewParticipant({ ...newParticipant, name: e.target.value })
-                        }
-                        fullWidth
-                        margin="normal"
-                    />
-                    <TextField
-                        label="טלפון"
-                        value={newParticipant.phone}
-                        onChange={(e) =>
-                            setNewParticipant({ ...newParticipant, phone: e.target.value })
-                        }
-                        fullWidth
-                        margin="normal"
-                    />
-                    <TextField
-                        label="מספר שולחן"
-                        value={newParticipant.table_number}
-                        onChange={(e) =>
-                            setNewParticipant({ ...newParticipant, table_number: e.target.value })
-                        }
-                        fullWidth
-                        margin="normal"
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog} color="secondary">
-                        ביטול
-                    </Button>
-                    <Button
-                        onClick={newParticipant.id ? handleSaveEdit : handleAddParticipant}
-                        color="primary"
-                    >
-                        {newParticipant.id ? "שמור" : "הוסף"}
-                    </Button>
-                </DialogActions>
-            </Dialog>
             <DeleteDialog
                 open={deleteDialogOpen}
                 onClose={() => setDeleteDialogOpen(false)}
