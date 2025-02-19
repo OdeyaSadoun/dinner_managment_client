@@ -39,6 +39,13 @@ const getParticipantsColumns = ({
             field: "gender",
             headerName: "מגדר",
             flex: 1,
+            renderCell: (params) => (
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+                    <Typography variant="body2">
+                        {params.row.gender === "male" ? "גברים" : params.row.gender === "female" ? "נשים" : ""}
+                    </Typography>
+                </Box>
+            ),
             editable: admin,
         },
         {
