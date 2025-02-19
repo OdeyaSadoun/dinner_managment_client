@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,16 +6,14 @@ import {
   DialogActions,
   TextField,
   Button,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
-  Checkbox,
-  FormControlLabel
+  Typography,
+  Box,
 } from "@mui/material";
 
 const AddAndEditParticipantDialog = ({ open, onClose, newParticipant, setNewParticipant, onSave }) => {
-  
+  const [genderDialogOpen, setGenderDialogOpen] = useState(false);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+
   useEffect(() => {
     if (open && !newParticipant.id) {
       setNewParticipant({
@@ -25,7 +23,7 @@ const AddAndEditParticipantDialog = ({ open, onClose, newParticipant, setNewPart
         is_reach_the_dinner: false,
         gender: "male",
         contact_person: "",
-        add_manual: false
+        add_manual: false,
       });
     }
   }, [open, newParticipant.id, setNewParticipant]);
@@ -56,16 +54,7 @@ const AddAndEditParticipantDialog = ({ open, onClose, newParticipant, setNewPart
           fullWidth
           margin="normal"
         />
-        <FormControl fullWidth margin="normal">
-          <InputLabel>מגדר</InputLabel>
-          <Select
-            value={newParticipant.gender || ""}
-            onChange={(e) => setNewParticipant({ ...newParticipant, gender: e.target.value })}
-          >
-            <MenuItem value="male">זכר</MenuItem>
-            <MenuItem value="female">נקבה</MenuItem>
-          </Select>
-        </FormControl>
+
         <TextField
           label="איש קשר"
           value={newParticipant.contact_person || ""}
@@ -73,28 +62,54 @@ const AddAndEditParticipantDialog = ({ open, onClose, newParticipant, setNewPart
           fullWidth
           margin="normal"
         />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={newParticipant.is_reach_the_dinner || false}
-              onChange={(e) =>
-                setNewParticipant({ ...newParticipant, is_reach_the_dinner: e.target.checked })
-              }
-            />
-          }
-          label="האם הגיע לדינר?"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={newParticipant.add_manual || false}
-              onChange={(e) =>
-                setNewParticipant({ ...newParticipant, add_manual: e.target.checked })
-              }
-            />
-          }
-          label="נוסף ידנית"
-        />
+
+        <Typography sx={{ mt: 2 }}>בחר מגדר:</Typography>
+        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+          <Button
+            variant={newParticipant.gender === "male" ? "contained" : "outlined"}
+            onClick={() => setNewParticipant({ ...newParticipant, gender: "male" })}
+          >
+            זכר
+          </Button>
+          <Button
+            variant={newParticipant.gender === "female" ? "contained" : "outlined"}
+            onClick={() => setNewParticipant({ ...newParticipant, gender: "female" })}
+          >
+            נקבה
+          </Button>
+        </Box>
+
+        <Typography sx={{ mt: 2 }}>האם הגיע לדינר?</Typography>
+        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+          <Button
+            variant={newParticipant.is_reach_the_dinner ? "contained" : "outlined"}
+            onClick={() => setNewParticipant({ ...newParticipant, is_reach_the_dinner: true })}
+          >
+            כן
+          </Button>
+          <Button
+            variant={!newParticipant.is_reach_the_dinner ? "contained" : "outlined"}
+            onClick={() => setNewParticipant({ ...newParticipant, is_reach_the_dinner: false })}
+          >
+            לא
+          </Button>
+        </Box>
+
+        <Typography sx={{ mt: 2 }}>האם נוסף ידנית?</Typography>
+        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+          <Button
+            variant={newParticipant.add_manual ? "contained" : "outlined"}
+            onClick={() => setNewParticipant({ ...newParticipant, add_manual: true })}
+          >
+            כן
+          </Button>
+          <Button
+            variant={!newParticipant.add_manual ? "contained" : "outlined"}
+            onClick={() => setNewParticipant({ ...newParticipant, add_manual: false })}
+          >
+            לא
+          </Button>
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
