@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -14,7 +14,22 @@ import {
   FormControlLabel
 } from "@mui/material";
 
-const AddEditParticipantDialog = ({ open, onClose, newParticipant, setNewParticipant, onSave }) => {
+const AddAndEditParticipantDialog = ({ open, onClose, newParticipant, setNewParticipant, onSave }) => {
+  
+  useEffect(() => {
+    if (open && !newParticipant.id) {
+      setNewParticipant({
+        name: "",
+        phone: "",
+        table_number: "",
+        is_reach_the_dinner: false,
+        gender: "male",
+        contact_person: "",
+        add_manual: false
+      });
+    }
+  }, [open, newParticipant.id, setNewParticipant]);
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{newParticipant.id ? "ערוך משתתף" : "הוסף משתתף"}</DialogTitle>
@@ -93,4 +108,4 @@ const AddEditParticipantDialog = ({ open, onClose, newParticipant, setNewPartici
   );
 };
 
-export default AddEditParticipantDialog;
+export default AddAndEditParticipantDialog;
