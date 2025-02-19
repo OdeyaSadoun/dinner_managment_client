@@ -98,6 +98,38 @@ const useParticipantActions = (setParticipants, tableMapping) => {
         }
     };
 
+    const handleCheckboxChange = async (participant) => {
+        try {
+            const updatedParticipant = {
+                ...participant,
+                is_reach_the_dinner: !participant.is_reach_the_dinner,
+            };
+            const tableId = tableMapping[participant.table_number];
+            console.log(tableId);
+            
+            if (tableId) {
+                if (updatedParticipant.is_reach_the_dinner) {
+                    await axios.patch(`http://localhost:8000/person/seat/${participant.id}`, {
+                        table_id: tableId,
+                    });
+                } else {
+                    await axios.patch(`http://localhost:8000/person/unseat/${participant.id}`, {
+                        table_id: tableId,
+                    });
+                }
+            } else {
+                console.error("Table ID not found for table number:", participant.table_number);
+            }
+
+            setParticipants((prev) =>
+                prev.map((p) => (p.id === participant.id ? updatedParticipant : p))
+            );
+        } catch (error) {
+            console.error("Error updating participant or table:", error);
+            alert("Failed to update participant. Please try again.");
+        }
+    };
+
     return {
         open,
         deleteDialogOpen,
@@ -110,7 +142,8 @@ const useParticipantActions = (setParticipants, tableMapping) => {
         handleSaveEdit,
         confirmDeleteParticipant,
         handleDeleteParticipant,
-        setDeleteDialogOpen
+        setDeleteDialogOpen,
+        handleCheckboxChange
     };
 };
 

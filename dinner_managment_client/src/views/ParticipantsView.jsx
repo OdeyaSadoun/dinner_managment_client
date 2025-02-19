@@ -7,7 +7,7 @@ import AddAndEditParticipantDialog from "../components/dialogs/AddAndEditPartici
 import DeleteDialog from "../components/dialogs/DeleteDialog";
 
 export default function ParticipantsView() {
-    const { participants, setParticipants, tables, tableMapping, loading, error } = useParticipantsData();
+    const { participants, setParticipants, tables, tableMapping, loading, error } = useParticipantsData();    
     const actions = useParticipantActions(setParticipants, tableMapping);
 
     return (
@@ -18,10 +18,8 @@ export default function ParticipantsView() {
                 loading={loading}
                 error={error}
                 handleSearch={() => {}}
-                handleOpenDialog={actions.handleOpenDialog}
                 admin={true}
-                handleEditParticipant={actions.handleEditParticipant}
-                confirmDeleteParticipant={actions.confirmDeleteParticipant}
+                handleCheckboxChange={actions.handleCheckboxChange}
             />
 
             <AddAndEditParticipantDialog

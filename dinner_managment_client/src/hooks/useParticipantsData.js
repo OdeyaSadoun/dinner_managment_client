@@ -44,7 +44,7 @@ const useParticipantsData = () => {
         fetchTables();
         fetchParticipants();
     }, []);
-
+        
     return { participants, setParticipants, tables, tableMapping, loading, error };
 };
 
