@@ -28,6 +28,7 @@ export default function UsersView() {
     name: "",
     username: "",
     role: "",
+    password: "123456"
   });
 
   const admin = isAdmin();
@@ -86,20 +87,17 @@ export default function UsersView() {
       const token = localStorage.getItem("token");
       const response = await axios.post(
         "http://localhost:8000/auth/register",
-        {
-          name: newUser.name,
-          username: newUser.username,
-          role: newUser.role,
-        },
+        newUser,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
+        console.log(response.data);
+        
       if (response.data.status === "success") {
-        setUsers((prev) => [...prev, response.data.data]);
+        setUsers((prev) => [...prev, { ...newUser, id: response.data.data.inserted_id }]);
         setNewUser({ name: "", username: "", role: "" });
         handleCloseDialog();
       } else {
@@ -109,7 +107,7 @@ export default function UsersView() {
       console.error("Error adding user:", error);
       alert("An error occurred while adding the user.");
     }
-  };
+  };  
 
   const handleDeleteUser = async (id) => {
     try {
@@ -118,7 +116,7 @@ export default function UsersView() {
         throw new Error("No authentication token found");
       }
 
-      await axios.delete(`http://localhost:8000/users/${id}`, {
+      await axios.patch(`http://localhost:8000/auth/delete_user/${id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -144,7 +142,7 @@ export default function UsersView() {
       const updatedUser = { ...newUser };
 
       const token = localStorage.getItem("token");
-      const response = await axios.put(`http://localhost:8000/users/${updatedUser.id}`, updatedUser, {
+      const response = await axios.put(`http://localhost:8000/auth/update_user/${updatedUser.id}`, updatedUser, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -193,7 +191,7 @@ export default function UsersView() {
             <Button
               variant="outlined"
               color="error"
-              onClick={() => handleDeleteUser(params.row.id)}
+              onClick={() => handleDeleteUser(params.row._id)}
             >
               מחק
             </Button>
@@ -253,7 +251,7 @@ export default function UsersView() {
           />
         </Box>
       )}
-      
+
       <Dialog open={open} onClose={handleCloseDialog}>
         <DialogTitle>{newUser.id ? "ערוך משתמש" : "הוסף משתמש"}</DialogTitle>
         <DialogContent>
