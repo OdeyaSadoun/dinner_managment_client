@@ -22,6 +22,7 @@ export default function UsersView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [newUser, setNewUser] = useState({
     name: "",
@@ -39,7 +40,7 @@ export default function UsersView() {
         console.log(isAdmin());
         
         
-        const response = await axios.get("http://localhost:8000/auth/get_all_users", {},
+        const response = await axios.get("http://localhost:8000/auth/get_all_users",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -49,7 +50,13 @@ export default function UsersView() {
         console.log({response});
         
         if (response.data.status === "success" && Array.isArray(response.data.data.users)) {
-          setUsers(response.data.data.users);
+          const usersWithId = response.data.data.users.map((user) => ({
+            ...user,
+            id: user._id,  
+          }));
+          console.log(usersWithId);
+          
+          setUsers(usersWithId);
         } else {
           setError("Failed to fetch users.");
         }
@@ -65,8 +72,10 @@ export default function UsersView() {
   }, []);
 
   const handleSearch = (filteredData) => {
+    setHasSearched(true);
     setFilteredUsers(filteredData);
   };
+  
 
   const handleOpenDialog = () => setOpen(true);
 
@@ -227,31 +236,24 @@ export default function UsersView() {
         <Alert severity="error" sx={{ mt: 4 }}>
           {error}
         </Alert>
-      ) : filteredUsers.length === 0 && users.length > 0 ? (
+      )  : hasSearched && filteredUsers.length === 0 ? (
         <Box sx={{ mt: 4, textAlign: "center" }}>
           <Typography variant="h6" color="text.secondary">
             לא נמצאו תוצאות.
           </Typography>
         </Box>
       ) : (
-        <Box
-          sx={{
-            height: "calc(100vh - 250px)",
-          }}
-        >
+        <Box sx={{ height: "calc(100vh - 250px)" }}>
           <DataGrid
             rows={filteredUsers.length > 0 ? filteredUsers : users}
-            columns={columns.map((column) => ({
-              ...column,
-              align: "center",
-            }))}
+            columns={columns.map((column) => ({ ...column, align: "center" }))}
             pageSize={10}
             rowsPerPageOptions={[10, 20, 50]}
             getRowId={(row) => row.id}
           />
         </Box>
       )}
-
+      
       <Dialog open={open} onClose={handleCloseDialog}>
         <DialogTitle>{newUser.id ? "ערוך משתמש" : "הוסף משתמש"}</DialogTitle>
         <DialogContent>
