@@ -15,6 +15,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import SearchBar from "../components/layouts/SearchBar";
+import DeleteDialog from "../components/dialogs/DeleteDialog";
 import isAdmin from "../utils/auth";
 
 export default function UsersView() {
@@ -22,6 +23,8 @@ export default function UsersView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [newUser, setNewUser] = useState({
@@ -37,10 +40,10 @@ export default function UsersView() {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem("token");
-        console.log({token});
+        console.log({ token });
         console.log(isAdmin());
-        
-        
+
+
         const response = await axios.get("http://localhost:8000/auth/get_all_users",
           {
             headers: {
@@ -48,15 +51,15 @@ export default function UsersView() {
             },
           }
         );
-        console.log({response});
-        
+        console.log({ response });
+
         if (response.data.status === "success" && Array.isArray(response.data.data.users)) {
           const usersWithId = response.data.data.users.map(({ _id, ...rest }) => ({
             ...rest,
             id: _id,
           }));
           console.log(usersWithId);
-          
+
           setUsers(usersWithId);
         } else {
           setError("Failed to fetch users.");
@@ -76,9 +79,17 @@ export default function UsersView() {
     setHasSearched(true);
     setFilteredUsers(filteredData);
   };
-  
 
-  const handleOpenDialog = () => setOpen(true);
+
+  const handleOpenDialog = () => {
+    setNewUser({
+      name: "",
+      username: "",
+      password: "123456",
+      role: "user",
+    });
+    setOpen(true);
+  };
 
   const handleCloseDialog = () => setOpen(false);
 
@@ -94,8 +105,8 @@ export default function UsersView() {
           },
         }
       );
-        console.log(response.data);
-        
+      console.log(response.data);
+
       if (response.data.status === "success") {
         setUsers((prev) => [...prev, { ...newUser, id: response.data.data.inserted_id }]);
         setNewUser({ name: "", username: "", role: "" });
@@ -107,25 +118,28 @@ export default function UsersView() {
       console.error("Error adding user:", error);
       alert("An error occurred while adding the user.");
     }
-  };  
+  };
 
-  const handleDeleteUser = async (id) => {
+  const confirmDeleteUser = (user) => {
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
-      await axios.patch(`http://localhost:8000/auth/delete_user/${id}`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.patch(`http://localhost:8000/auth/delete_user/${userToDelete.id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      setUsers((prev) => prev.filter((user) => user.id !== id));
+      setUsers((prev) => prev.filter((user) => user.id !== userToDelete.id));
     } catch (error) {
       console.error("Error deleting user:", error);
       alert("Failed to delete user. Please try again.");
+    } finally {
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
     }
   };
 
@@ -135,7 +149,7 @@ export default function UsersView() {
       id: user.id || user._id, // ← בדיקה כפולה
     });
     setOpen(true);
-  };  
+  };
 
   const handleSaveEdit = async () => {
     try {
@@ -189,7 +203,7 @@ export default function UsersView() {
             <Button
               variant="outlined"
               color="error"
-              onClick={() => handleDeleteUser(params.row._id)}
+              onClick={() => confirmDeleteUser(params.row)}
             >
               מחק
             </Button>
@@ -232,7 +246,7 @@ export default function UsersView() {
         <Alert severity="error" sx={{ mt: 4 }}>
           {error}
         </Alert>
-      )  : hasSearched && filteredUsers.length === 0 ? (
+      ) : hasSearched && filteredUsers.length === 0 ? (
         <Box sx={{ mt: 4, textAlign: "center" }}>
           <Typography variant="h6" color="text.secondary">
             לא נמצאו תוצאות.
@@ -293,6 +307,16 @@ export default function UsersView() {
           </Button>
         </DialogActions>
       </Dialog>
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteUser}
+        title="אישור מחיקת משתמש"
+        message="האם אתה בטוח שברצונך למחוק משתמש זה?"
+        confirmText="מחק"
+        cancelText="ביטול"
+      />
+
     </Container>
   );
 }
