@@ -54,6 +54,8 @@ const useParticipantActions = (setParticipants, tableMapping) => {
     const handleSaveEdit = async () => {
         try {
             const token = localStorage.getItem("token");
+            console.log(newParticipant);
+            
             const response = await axios.put(
                 `http://localhost:8000/person/${newParticipant.id}`,
                 newParticipant,

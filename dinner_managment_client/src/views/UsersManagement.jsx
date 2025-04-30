@@ -51,9 +51,9 @@ export default function UsersView() {
         console.log({response});
         
         if (response.data.status === "success" && Array.isArray(response.data.data.users)) {
-          const usersWithId = response.data.data.users.map((user) => ({
-            ...user,
-            id: user._id,  
+          const usersWithId = response.data.data.users.map(({ _id, ...rest }) => ({
+            ...rest,
+            id: _id,
           }));
           console.log(usersWithId);
           
