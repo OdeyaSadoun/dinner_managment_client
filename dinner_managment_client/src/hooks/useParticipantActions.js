@@ -1,7 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
 
-const useParticipantActions = (setParticipants, tableMapping) => {
+const useParticipantActions = (
+  setParticipants,
+  tableMapping,
+  setSnackbarOpen,
+  setSnackbarMessage,
+  setSnackbarSeverity
+) => {
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [participantToDelete, setParticipantToDelete] = useState(null);
@@ -149,9 +155,17 @@ const useParticipantActions = (setParticipants, tableMapping) => {
       };
       console.log(participant);
       console.log(tableMapping);
-      
-      
+
       const tableId = tableMapping[participant.table_number];
+
+      if (!tableId) {
+        setSnackbarMessage(
+          `שולחן מספר ${participant.table_number} לא קיים במערכת. לא ניתן להושיב את המשתתף.`
+        );
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+        return;
+      }
       console.log(tableId);
 
       if (tableId) {

@@ -3,7 +3,7 @@ import usePrintLabel from '../hooks/usePrinter';
 import useParticipantActions from '../hooks/useParticipantActions';
 import useParticipantsData from '../hooks/useParticipantsData';
 import ParticipantsTable from '../components/tables/ParticipantsTable';
-import { Container } from '@mui/material';
+import { Container, Snackbar, Alert } from '@mui/material';
 import AddAndEditParticipantDialog from '../components/dialogs/AddAndEditParticipantDialog';
 import DeleteDialog from '../components/dialogs/DeleteDialog';
 import isAdmin from '../utils/auth';
@@ -19,18 +19,30 @@ const ParticipantsView = () => {
   } = useParticipantsData();
   const admin = isAdmin();
 
-  const actions = useParticipantActions(setParticipants, tableMapping);
-  const handlePrintLabel = usePrintLabel();
-  const [searchTerm, setSearchTerm] = useState("");  // חדש!
-
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
 
+  // Snackbar state
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("error");
+
   const handleSearch = (results, term) => {
     setFilteredParticipants(results);
-    setSearchTerm(term); // שמירת מונח החיפוש
+    setSearchTerm(term);
     setHasSearched(term !== "");
   };
+
+  const actions = useParticipantActions(
+    setParticipants,
+    tableMapping,
+    setSnackbarOpen,
+    setSnackbarMessage,
+    setSnackbarSeverity
+  );
+
+  const handlePrintLabel = usePrintLabel();
 
   return (
     <Container maxWidth="lg" sx={{ mt: 8, minHeight: '80vh' }}>
@@ -78,6 +90,21 @@ const ParticipantsView = () => {
           cancelText="ביטול"
         />
       )}
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
