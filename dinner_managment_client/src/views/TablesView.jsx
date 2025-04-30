@@ -14,7 +14,8 @@ export default function TablesView() {
   const { handleDragStart, handleDrop, handleDragOver } = useDragAndDrop(tables, setTables);
   const tableActions = useTableActions(setTables);
   const admin = isAdmin();
-
+  console.log(admin);
+  
   return (
     <Container maxWidth="lg" sx={{ mt: 8, height: "80vh", position: "relative" }}>
       <TablesLayout
@@ -25,6 +26,7 @@ export default function TablesView() {
         handleDrop={admin ? handleDrop : undefined}
         confirmDeleteTable={admin ? tableActions.confirmDeleteTable : undefined}
         handleChairClick={tableActions.handleChairClick}
+        admin={admin}
       />
       {admin && (
         <AddTableDialog
