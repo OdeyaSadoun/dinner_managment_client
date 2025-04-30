@@ -7,6 +7,7 @@ import DeleteDialog from "../components/dialogs/DeleteDialog";
 import AddTableDialog from "../components/dialogs/AddTableDialog";
 import TablesLayout from "../components/layouts/TablesLayout";
 import isAdmin from "../utils/auth";
+import { Snackbar, Alert as MuiAlert } from "@mui/material";
 
 
 export default function TablesView() {
@@ -15,7 +16,7 @@ export default function TablesView() {
   const tableActions = useTableActions(setTables);
   const admin = isAdmin();
   console.log(admin);
-  
+
   return (
     <Container maxWidth="lg" sx={{ mt: 8, height: "80vh", position: "relative" }}>
       <TablesLayout
@@ -55,6 +56,17 @@ export default function TablesView() {
           cancelText="ביטול"
         />
       )}
+      <Snackbar
+        open={tableActions.snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => tableActions.setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <MuiAlert onClose={() => tableActions.setSnackbarOpen(false)} severity={tableActions.snackbarSeverity} sx={{ width: '100%' }}>
+          {tableActions.snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
+
     </Container>
   );
 }

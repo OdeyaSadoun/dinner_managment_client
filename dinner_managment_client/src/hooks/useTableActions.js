@@ -1,5 +1,5 @@
-import { useState } from "react";
 import axios from "axios";
+import React, { useState } from "react";
 
 const useTableActions = (setTables) => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -9,9 +9,12 @@ const useTableActions = (setTables) => {
   const [tableShape, setTableShape] = useState("circle");
   const [chairs, setChairs] = useState(8);
   const [tableNumber, setTableNumber] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("error"); // 'success' | 'error' | 'warning' | 'info'
 
   const handleOpenDialog = () => setOpenDialog(true);
-  
+
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setChairs(8);
@@ -20,7 +23,9 @@ const useTableActions = (setTables) => {
 
   const handleAddTable = async () => {
     if (!tableNumber) {
-      alert("יש להזין מספר שולחן.");
+      setSnackbarMessage("יש להזין מספר שולחן.");
+      setSnackbarSeverity("warning");
+      setSnackbarOpen(true);
       return;
     }
 
@@ -37,16 +42,35 @@ const useTableActions = (setTables) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token not found. Please login again.");
 
-      const response = await axios.post("http://localhost:8000/table", newTable, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        "http://localhost:8000/table",
+        newTable,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response.data.status === "success") {
-        setTables((prev) => [...prev, { ...newTable, id: response.data.data.inserted_id }]);
+        setTables((prev) => [
+          ...prev,
+          { ...newTable, id: response.data.data.inserted_id },
+        ]);
+        setSnackbarMessage("השולחן נוסף בהצלחה!");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
         handleCloseDialog();
+      } else {
+        setSnackbarMessage(
+          response.data.message || "שולחן עם מספר זה כבר קיים במערכת."
+        );
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error("Error adding new table:", error);
+      setSnackbarMessage("אירעה שגיאה כללית בהוספת שולחן.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -62,9 +86,13 @@ const useTableActions = (setTables) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
-      await axios.patch(`http://localhost:8000/table/delete/${tableToDelete}`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.patch(
+        `http://localhost:8000/table/delete/${tableToDelete}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       setTables((prev) => prev.filter((table) => table.id !== tableToDelete));
     } catch (error) {
@@ -79,7 +107,7 @@ const useTableActions = (setTables) => {
   return {
     openDialog,
     setOpenDialog, // מחזירים כדי שיהיה אפשר לשנות מחוץ ל-hook
-    deleteDialogOpen, 
+    deleteDialogOpen,
     setDeleteDialogOpen, // מחזירים כדי שיהיה אפשר לשנות מחוץ ל-hook
     tableGender,
     setTableGender,
@@ -94,6 +122,12 @@ const useTableActions = (setTables) => {
     handleAddTable,
     confirmDeleteTable,
     handleDeleteTable,
+    snackbarOpen,
+    setSnackbarOpen,
+    snackbarMessage,
+    setSnackbarMessage,
+    snackbarSeverity,
+    setSnackbarSeverity,
   };
 };
 
