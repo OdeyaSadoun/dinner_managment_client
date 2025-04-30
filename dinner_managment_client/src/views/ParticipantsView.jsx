@@ -6,6 +6,7 @@ import ParticipantsTable from '../components/tables/ParticipantsTable';
 import { Container } from '@mui/material';
 import AddAndEditParticipantDialog from '../components/dialogs/AddAndEditParticipantDialog';
 import DeleteDialog from '../components/dialogs/DeleteDialog';
+import isAdmin from '../utils/auth';
 
 const ParticipantsView = () => {
   const {
@@ -16,6 +17,7 @@ const ParticipantsView = () => {
     loading,
     error,
   } = useParticipantsData();
+  const admin = isAdmin();
 
   const actions = useParticipantActions(setParticipants, tableMapping);
   const handlePrintLabel = usePrintLabel();
@@ -37,36 +39,45 @@ const ParticipantsView = () => {
         filteredParticipants={hasSearched ? filteredParticipants : participants}
         loading={loading}
         error={error}
-        admin={true}
+        admin={admin}
+        allowPrint={true}
+        allowCheckbox={true}
+        allowEdit={admin}
+        allowDelete={admin}
+        allowAdd={admin}
         handleSearch={handleSearch}
         handleCheckboxChange={actions.handleCheckboxChange}
         handlePrintLabel={handlePrintLabel}
-        handleEditParticipant={actions.handleEditParticipant}
-        confirmDeleteParticipant={actions.confirmDeleteParticipant}
-        handleOpenDialog={actions.handleOpenDialog}
+        handleEditParticipant={admin ? actions.handleEditParticipant : undefined}
+        confirmDeleteParticipant={admin ? actions.confirmDeleteParticipant : undefined}
+        handleOpenDialog={admin ? actions.handleOpenDialog : undefined}
       />
 
-      <AddAndEditParticipantDialog
-        open={actions.open}
-        onClose={actions.handleCloseDialog}
-        newParticipant={actions.newParticipant}
-        setNewParticipant={actions.setNewParticipant}
-        onSave={
-          actions.newParticipant.id
-            ? actions.handleSaveEdit
-            : actions.handleAddParticipant
-        }
-      />
+      {admin && (
+        <AddAndEditParticipantDialog
+          open={actions.open}
+          onClose={actions.handleCloseDialog}
+          newParticipant={actions.newParticipant}
+          setNewParticipant={actions.setNewParticipant}
+          onSave={
+            actions.newParticipant.id
+              ? actions.handleSaveEdit
+              : actions.handleAddParticipant
+          }
+        />
+      )}
 
-      <DeleteDialog
-        open={actions.deleteDialogOpen}
-        onClose={() => actions.setDeleteDialogOpen(false)}
-        onConfirm={actions.handleDeleteParticipant}
-        title="אישור מחיקת משתתף"
-        message="האם אתה בטוח שברצונך למחוק משתתף זה?"
-        confirmText="מחק"
-        cancelText="ביטול"
-      />
+      {admin && (
+        <DeleteDialog
+          open={actions.deleteDialogOpen}
+          onClose={() => actions.setDeleteDialogOpen(false)}
+          onConfirm={actions.handleDeleteParticipant}
+          title="אישור מחיקת משתתף"
+          message="האם אתה בטוח שברצונך למחוק משתתף זה?"
+          confirmText="מחק"
+          cancelText="ביטול"
+        />
+      )}
     </Container>
   );
 };

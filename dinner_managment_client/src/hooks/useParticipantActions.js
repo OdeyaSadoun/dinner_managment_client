@@ -147,6 +147,10 @@ const useParticipantActions = (setParticipants, tableMapping) => {
         ...participant,
         is_reach_the_dinner: !participant.is_reach_the_dinner,
       };
+      console.log(participant);
+      console.log(tableMapping);
+      
+      
       const tableId = tableMapping[participant.table_number];
       console.log(tableId);
 

@@ -11,14 +11,23 @@ const ParticipantsTable = ({
   error,
   handleSearch,
   handleOpenDialog,
-  admin,
   handleCheckboxChange,
   handlePrintLabel,
   handleEditParticipant,
   confirmDeleteParticipant,
+  admin,
+  allowPrint,
+  allowCheckbox,
+  allowEdit,
+  allowDelete,
+  allowAdd,
 }) => {
   const columns = getParticipantsColumns({
     admin,
+    allowPrint,
+    allowCheckbox,
+    allowEdit,
+    allowDelete,
     handleCheckboxChange,
     handlePrintLabel,
     handleEditParticipant,
@@ -40,9 +49,17 @@ const ParticipantsTable = ({
             (participant) => participant.phone,
           ]}
         />
-        <Button variant="contained" color="primary" onClick={handleOpenDialog} sx={{ alignSelf: "flex-end" }}>
-          הוסף משתתף
-        </Button>
+        {allowAdd && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleOpenDialog}
+            sx={{ alignSelf: "flex-end" }}
+          >
+            הוסף משתתף
+          </Button>
+        )}
+
       </Box>
 
       {loading ? (

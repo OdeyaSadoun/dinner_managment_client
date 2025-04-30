@@ -4,15 +4,22 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Chair from "../../style/Chair";
 import Table from "../../style/Table";
 
-const TablesLayout = ({ tables, handleOpenDialog, handleDragStart, handleDragOver, handleDrop, confirmDeleteTable, handleChairClick }) => {
+const TablesLayout = ({ tables, handleOpenDialog, handleDragStart, handleDragOver, handleDrop, confirmDeleteTable, handleChairClick, admin }) => {
     return (
         <Box sx={{ mt: 8, height: "80vh", position: "relative" }}>
             <Typography variant="h4" align="center" gutterBottom>
                 תצוגת שולחנות
             </Typography>
-            <Button variant="contained" color="primary" onClick={handleOpenDialog} sx={{ mb: 2 }}>
-                הוסף שולחן
-            </Button>
+            {admin && (
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpenDialog}
+                    sx={{ mb: 2 }}
+                >
+                    הוסף שולחן
+                </Button>
+            )}
             <Box
                 sx={{
                     position: "relative",
@@ -45,24 +52,27 @@ const TablesLayout = ({ tables, handleOpenDialog, handleDragStart, handleDragOve
                             <Typography variant="h6" align="center">
                                 שולחן {table.table_number}
                             </Typography>
-                            <DeleteIcon
-                                onClick={() => confirmDeleteTable(table.id)}
-                                sx={{
-                                    position: "absolute",
-                                    top: "-20px",
-                                    right: "-20px",
-                                    backgroundColor: "white",
-                                    borderRadius: "50%",
-                                    padding: "4px",
-                                    color: "red",
-                                    fontSize: 28,
-                                    cursor: "pointer",
-                                    zIndex: 10,
-                                    "&:hover": {
-                                        color: "darkred",
-                                    },
-                                }}
-                            />
+                            {admin && (
+                                <DeleteIcon
+                                    onClick={() => confirmDeleteTable(table.id)}
+                                    sx={{
+                                        position: "absolute",
+                                        top: "-20px",
+                                        right: "-20px",
+                                        backgroundColor: "white",
+                                        borderRadius: "50%",
+                                        padding: "4px",
+                                        color: "red",
+                                        fontSize: 28,
+                                        cursor: "pointer",
+                                        zIndex: 10,
+                                        "&:hover": {
+                                            color: "darkred",
+                                        },
+                                    }}
+                                />
+                            )}
+
                             {Array.from({ length: table.chairs }).map((_, index) => {
                                 const person = table.people_list[index];
                                 const angle = (360 / table.chairs) * index;
