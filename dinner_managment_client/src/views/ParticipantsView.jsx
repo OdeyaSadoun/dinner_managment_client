@@ -27,6 +27,7 @@ const ParticipantsView = () => {
         handlePrintLabel={handlePrintLabel}  // העברת הפונקציה כ-prop
         handleEditParticipant={actions.handleEditParticipant}
         confirmDeleteParticipant ={actions.confirmDeleteParticipant}
+        handleOpenDialog = {actions.handleOpenDialog}
       />
 
       <AddAndEditParticipantDialog

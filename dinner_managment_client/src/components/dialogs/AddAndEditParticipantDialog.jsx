@@ -94,22 +94,6 @@ const AddAndEditParticipantDialog = ({ open, onClose, newParticipant, setNewPart
             לא
           </Button>
         </Box>
-
-        <Typography sx={{ mt: 2 }}>האם נוסף ידנית?</Typography>
-        <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-          <Button
-            variant={newParticipant.add_manual ? "contained" : "outlined"}
-            onClick={() => setNewParticipant({ ...newParticipant, add_manual: true })}
-          >
-            כן
-          </Button>
-          <Button
-            variant={!newParticipant.add_manual ? "contained" : "outlined"}
-            onClick={() => setNewParticipant({ ...newParticipant, add_manual: false })}
-          >
-            לא
-          </Button>
-        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
