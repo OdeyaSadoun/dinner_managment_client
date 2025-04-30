@@ -12,7 +12,7 @@ const useParticipantActions = (setParticipants, tableMapping) => {
     is_reach_the_dinner: false,
     gender: "male",
     contact_person: "",
-    add_manual: false,
+    add_manual: true,
   });
 
   const handleOpenDialog = () => {
@@ -33,15 +33,22 @@ const useParticipantActions = (setParticipants, tableMapping) => {
   const handleAddParticipant = async () => {
     try {
       const token = localStorage.getItem("token");
+      const payload = {
+        ...newParticipant,
+        add_manual: true, // מכריח שזה יהיה true
+      };
+      
       const response = await axios.post(
         "http://localhost:8000/person",
-        newParticipant,
+        payload,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
       if (response.data.status === "success") {
+        console.log(response.data.data);
+        
         setParticipants((prev) => [...prev, response.data.data]);
         setNewParticipant({
           name: "",
