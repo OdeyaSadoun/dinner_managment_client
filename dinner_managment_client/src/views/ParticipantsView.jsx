@@ -19,13 +19,15 @@ const ParticipantsView = () => {
 
   const actions = useParticipantActions(setParticipants, tableMapping);
   const handlePrintLabel = usePrintLabel();
+  const [searchTerm, setSearchTerm] = useState("");  // חדש!
 
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = (filtered) => {
-    setHasSearched(true);
-    setFilteredParticipants(filtered);
+  const handleSearch = (results, term) => {
+    setFilteredParticipants(results);
+    setSearchTerm(term); // שמירת מונח החיפוש
+    setHasSearched(term !== "");
   };
 
   return (

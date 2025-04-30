@@ -37,7 +37,7 @@ const useParticipantActions = (setParticipants, tableMapping) => {
         ...newParticipant,
         add_manual: true, // מכריח שזה יהיה true
       };
-      
+
       const response = await axios.post(
         "http://localhost:8000/person",
         payload,
@@ -48,7 +48,7 @@ const useParticipantActions = (setParticipants, tableMapping) => {
 
       if (response.data.status === "success") {
         console.log(response.data.data);
-        
+
         setParticipants((prev) => [...prev, response.data.data]);
         setNewParticipant({
           name: "",
@@ -120,9 +120,18 @@ const useParticipantActions = (setParticipants, tableMapping) => {
         }
       );
 
-      setParticipants((prev) =>
-        prev.filter((p) => p.id !== participantToDelete)
-      );
+      setParticipants((prev) => {
+        const updated = prev.filter((p) => p.id !== participantToDelete);
+        if (hasSearched) {
+          const filtered = updated.filter((p) =>
+            [p.name, p.phone].some((val) =>
+              val?.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+          );
+          setFilteredParticipants(filtered);
+        }
+        return updated;
+      });
     } catch (error) {
       console.error("Error deleting participant:", error);
       alert("Failed to delete participant. Please try again.");

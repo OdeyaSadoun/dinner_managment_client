@@ -16,32 +16,32 @@ const SearchBar = ({ data, onSearch, searchBy }) => {
     if (searchValue !== '') {
       filteredData = data.filter((item) =>
         searchBy.some((searchField) =>
-          searchField(item).toLowerCase().includes(searchValue.toLowerCase())
+          searchField(item)?.toLowerCase().includes(searchValue.toLowerCase())
         )
       );
     }
 
-    onSearch(filteredData);
+    onSearch(filteredData, searchValue);
   };
 
   return (
-<Paper sx={{ boxShadow: 'none' }}>
-  <TextField
-    variant="outlined"
-    fullWidth
-    value={searchTerm}
-    onChange={handleSearch}
-    placeholder="חפש..." 
-    InputProps={{
-      startAdornment: (
-        <InputAdornment position="start">
-          <SearchIcon />
-        </InputAdornment>
-      ),
-    }}
-    sx={{ direction: 'rtl' }}
-  />
-</Paper>
+    <Paper sx={{ boxShadow: 'none' }}>
+      <TextField
+        variant="outlined"
+        fullWidth
+        value={searchTerm}
+        onChange={handleSearch}
+        placeholder="חפש..."
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+        sx={{ direction: 'rtl' }}
+      />
+    </Paper>
   );
 };
 
