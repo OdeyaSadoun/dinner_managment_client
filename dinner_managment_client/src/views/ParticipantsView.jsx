@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import usePrintLabel from '../hooks/usePrinter';
 import useParticipantActions from '../hooks/useParticipantActions';
 import useParticipantsData from '../hooks/useParticipantsData';
@@ -7,27 +7,41 @@ import { Container } from '@mui/material';
 import AddAndEditParticipantDialog from '../components/dialogs/AddAndEditParticipantDialog';
 import DeleteDialog from '../components/dialogs/DeleteDialog';
 
-
 const ParticipantsView = () => {
-  const { participants, setParticipants, tables, tableMapping, loading, error } = useParticipantsData();
-  const actions = useParticipantActions(setParticipants, tableMapping);
+  const {
+    participants,
+    setParticipants,
+    tables,
+    tableMapping,
+    loading,
+    error,
+  } = useParticipantsData();
 
-  const handlePrintLabel = usePrintLabel();  // קריאה להוק שמחזיר את הפונקציה להדפסה
+  const actions = useParticipantActions(setParticipants, tableMapping);
+  const handlePrintLabel = usePrintLabel();
+
+  const [filteredParticipants, setFilteredParticipants] = useState([]);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const handleSearch = (filtered) => {
+    setHasSearched(true);
+    setFilteredParticipants(filtered);
+  };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 8, minHeight: "80vh" }}>
+    <Container maxWidth="lg" sx={{ mt: 8, minHeight: '80vh' }}>
       <ParticipantsTable
         participants={participants}
-        filteredParticipants={participants}
+        filteredParticipants={hasSearched ? filteredParticipants : participants}
         loading={loading}
         error={error}
-        handleSearch={() => {}}
         admin={true}
+        handleSearch={handleSearch}
         handleCheckboxChange={actions.handleCheckboxChange}
-        handlePrintLabel={handlePrintLabel}  // העברת הפונקציה כ-prop
+        handlePrintLabel={handlePrintLabel}
         handleEditParticipant={actions.handleEditParticipant}
-        confirmDeleteParticipant ={actions.confirmDeleteParticipant}
-        handleOpenDialog = {actions.handleOpenDialog}
+        confirmDeleteParticipant={actions.confirmDeleteParticipant}
+        handleOpenDialog={actions.handleOpenDialog}
       />
 
       <AddAndEditParticipantDialog
@@ -35,7 +49,11 @@ const ParticipantsView = () => {
         onClose={actions.handleCloseDialog}
         newParticipant={actions.newParticipant}
         setNewParticipant={actions.setNewParticipant}
-        onSave={actions.newParticipant.id ? actions.handleSaveEdit : actions.handleAddParticipant}
+        onSave={
+          actions.newParticipant.id
+            ? actions.handleSaveEdit
+            : actions.handleAddParticipant
+        }
       />
 
       <DeleteDialog

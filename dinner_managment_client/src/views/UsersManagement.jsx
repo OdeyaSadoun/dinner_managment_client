@@ -17,6 +17,8 @@ import axios from "axios";
 import SearchBar from "../components/layouts/SearchBar";
 import DeleteDialog from "../components/dialogs/DeleteDialog";
 import isAdmin from "../utils/auth";
+import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+
 
 export default function UsersView() {
   const [users, setUsers] = useState([]);
@@ -285,15 +287,22 @@ export default function UsersView() {
             fullWidth
             margin="normal"
           />
-          <TextField
-            label="תפקיד"
-            value={newUser.role}
-            onChange={(e) =>
-              setNewUser({ ...newUser, role: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-          />
+          <Typography sx={{ mt: 2 }}>בחר תפקיד:</Typography>
+          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <Button
+              variant={newUser.role === "user" ? "contained" : "outlined"}
+              onClick={() => setNewUser({ ...newUser, role: "user" })}
+            >
+              משתמש
+            </Button>
+            <Button
+              variant={newUser.role === "admin" ? "contained" : "outlined"}
+              onClick={() => setNewUser({ ...newUser, role: "admin" })}
+            >
+              מנהל
+            </Button>
+          </Box>
+
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">
