@@ -2,12 +2,15 @@ import { useState } from "react";
 import axios from "axios";
 
 const useParticipantActions = (
-  setParticipants,
-  tableMapping,
-  setSnackbarOpen,
-  setSnackbarMessage,
-  setSnackbarSeverity
-) => {
+    setParticipants,
+    tableMapping,
+    setSnackbarOpen,
+    setSnackbarMessage,
+    setSnackbarSeverity,
+    hasSearched,
+    searchTerm,
+    setFilteredParticipants
+  ) => {
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [participantToDelete, setParticipantToDelete] = useState(null);

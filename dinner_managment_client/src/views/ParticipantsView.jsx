@@ -39,7 +39,10 @@ const ParticipantsView = () => {
     tableMapping,
     setSnackbarOpen,
     setSnackbarMessage,
-    setSnackbarSeverity
+    setSnackbarSeverity,
+    hasSearched,
+    searchTerm,
+    setFilteredParticipants
   );
 
   const handlePrintLabel = usePrintLabel();
