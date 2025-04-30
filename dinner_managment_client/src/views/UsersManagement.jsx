@@ -27,8 +27,8 @@ export default function UsersView() {
   const [newUser, setNewUser] = useState({
     name: "",
     username: "",
-    role: "",
-    password: "123456"
+    password: "123456",
+    role: "user",
   });
 
   const admin = isAdmin();
@@ -132,17 +132,15 @@ export default function UsersView() {
   const handleEditUser = (user) => {
     setNewUser({
       ...user,
-      id: user.id,
+      id: user.id || user._id, // ← בדיקה כפולה
     });
     setOpen(true);
-  };
+  };  
 
   const handleSaveEdit = async () => {
     try {
-      const updatedUser = { ...newUser };
-
       const token = localStorage.getItem("token");
-      const response = await axios.put(`http://localhost:8000/auth/update_user/${updatedUser.id}`, updatedUser, {
+      const response = await axios.put(`http://localhost:8000/auth/update_user/${newUser.id}`, newUser, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -151,7 +149,7 @@ export default function UsersView() {
       if (response.data.status === "success") {
         setUsers((prev) =>
           prev.map((user) =>
-            user.id === updatedUser.id ? updatedUser : user
+            user.id === newUser.id ? newUser : user
           )
         );
       }

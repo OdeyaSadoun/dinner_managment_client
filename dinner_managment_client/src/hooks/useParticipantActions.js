@@ -34,7 +34,7 @@ const useParticipantActions = (setParticipants, tableMapping) => {
                     is_reach_the_dinner: false,
                     gender: "male",
                     contact_person: "",
-                    add_manual: false
+                    add_manual: true
                 });
                 handleCloseDialog();
             } else {

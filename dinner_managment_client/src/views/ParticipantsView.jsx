@@ -25,6 +25,8 @@ const ParticipantsView = () => {
         admin={true}
         handleCheckboxChange={actions.handleCheckboxChange}
         handlePrintLabel={handlePrintLabel}  // העברת הפונקציה כ-prop
+        handleEditParticipant={actions.handleEditParticipant}
+        confirmDeleteParticipant ={actions.confirmDeleteParticipant}
       />
 
       <AddAndEditParticipantDialog
