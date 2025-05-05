@@ -28,7 +28,7 @@ const useTableActions = (setTables) => {
       setSnackbarOpen(true);
       return;
     }
-
+  
     const newTable = {
       people_list: [],
       position: { x: 50, y: 50 },
@@ -37,11 +37,11 @@ const useTableActions = (setTables) => {
       shape: tableShape,
       gender: tableGender,
     };
-
+  
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token not found. Please login again.");
-
+  
       const response = await axios.post(
         "http://localhost:8000/table",
         newTable,
@@ -49,22 +49,26 @@ const useTableActions = (setTables) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+  
       if (response.data.status === "success") {
         const insertedId = response.data.data?.inserted_id;
-
         if (insertedId) {
           setTables((prev) => [...prev, { ...newTable, id: insertedId }]);
-          handleCloseDialog(); // 👈 רק אם הצליח
+          handleCloseDialog();
           setSnackbarMessage("השולחן נוסף בהצלחה!");
           setSnackbarSeverity("success");
           setSnackbarOpen(true);
         } else {
-          // משהו לא תקין בתשובה
-          setSnackbarMessage("שגיאה בהוספת שולחן - מזהה חסר");
+          setSnackbarMessage("שגיאה בהוספת שולחן - מזהה חסר.");
           setSnackbarSeverity("error");
           setSnackbarOpen(true);
         }
+      } else {
+        const serverMessage =
+          response.data?.data?.error_message || "שולחן לא נוסף - ייתכן שכבר קיים.";
+        setSnackbarMessage(serverMessage);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error("Error adding new table:", error);
@@ -73,7 +77,7 @@ const useTableActions = (setTables) => {
       setSnackbarOpen(true);
     }
   };
-
+  
   const confirmDeleteTable = (tableId) => {
     setTableToDelete(tableId);
     setDeleteDialogOpen(true);
