@@ -51,20 +51,20 @@ const useTableActions = (setTables) => {
       );
 
       if (response.data.status === "success") {
-        setTables((prev) => [
-          ...prev,
-          { ...newTable, id: response.data.data.inserted_id },
-        ]);
-        setSnackbarMessage("השולחן נוסף בהצלחה!");
-        setSnackbarSeverity("success");
-        setSnackbarOpen(true);
-        handleCloseDialog();
-      } else {
-        setSnackbarMessage(
-          response.data.message || "שולחן עם מספר זה כבר קיים במערכת."
-        );
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
+        const insertedId = response.data.data?.inserted_id;
+
+        if (insertedId) {
+          setTables((prev) => [...prev, { ...newTable, id: insertedId }]);
+          handleCloseDialog(); // 👈 רק אם הצליח
+          setSnackbarMessage("השולחן נוסף בהצלחה!");
+          setSnackbarSeverity("success");
+          setSnackbarOpen(true);
+        } else {
+          // משהו לא תקין בתשובה
+          setSnackbarMessage("שגיאה בהוספת שולחן - מזהה חסר");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
+        }
       }
     } catch (error) {
       console.error("Error adding new table:", error);
