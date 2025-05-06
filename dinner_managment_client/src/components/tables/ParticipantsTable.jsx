@@ -3,6 +3,8 @@ import { Box, Typography, Button, CircularProgress, Alert } from "@mui/material"
 import { DataGrid } from "@mui/x-data-grid";
 import SearchBar from "../layouts/SearchBar";
 import getParticipantsColumns from "./ParticipantsColumns";
+import UploadIcon from "@mui/icons-material/Upload";
+import AddIcon from "@mui/icons-material/Add";
 
 const ParticipantsTable = ({
   participants,
@@ -49,17 +51,36 @@ const ParticipantsTable = ({
             (participant) => participant.phone,
           ]}
         />
-        {allowAdd && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenDialog}
-            sx={{ alignSelf: "flex-end" }}
-          >
-            הוסף משתתף
-          </Button>
-        )}
 
+        {allowAdd && (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {/* כפתור הוספה בירוק */}
+            <Button
+              variant="text"
+              color="success"
+              onClick={handleOpenDialog}
+              sx={{ minWidth: 0, p: 1 }}
+            >
+              <AddIcon />
+            </Button>
+
+            {/* כפתור ייבוא מ־CSV בסגול */}
+            <Button
+              variant="text"
+              component="label"
+              color="secondary"
+              sx={{ minWidth: 0, p: 1 }}
+            >
+              <UploadIcon />
+              <input
+                type="file"
+                accept=".csv"
+                hidden
+                onChange={(e) => handleCSVUpload(e)}
+              />
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {loading ? (
