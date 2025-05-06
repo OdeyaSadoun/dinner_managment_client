@@ -1,16 +1,17 @@
 import axios from 'axios';
 
 const usePrintLabel = () => {
-  const handlePrintLabel = (participantId) => {
-    // שליחת בקשת GET לשרת עם axios כדי להדפיס את התווית עבור משתתף
-    axios.get(`http://localhost:8000/print/print_sticker`)
+  const handlePrintLabel = (participant) => {
+    axios.post(`http://localhost:8000/print/print_sticker`, {
+      full_name: participant.name,
+      gender: participant.gender,
+      table_number: participant.table_number,
+    })
       .then((response) => {
-        // במקרה של הצלחה
         console.log("Printing successful:", response.data);
         alert('הפתקית הודפסה בהצלחה!');
       })
       .catch((error) => {
-        // במקרה של שגיאה
         console.error('Error printing label:', error);
         alert('שגיאה בהדפסה');
       });
@@ -20,4 +21,3 @@ const usePrintLabel = () => {
 };
 
 export default usePrintLabel;
-
