@@ -16,8 +16,9 @@ export default function Login({ setUser }) {
         password,
       });
       if (response.data.status === "success") {
-        const { username, token } = response.data.data;
-
+        const { username, token, role } = response.data.data;
+        console.log(response.data);
+        
         // שמירת שם משתמש וטוקן ב-Local Storage
         localStorage.setItem("username", username);
         localStorage.setItem("token", token);
@@ -64,7 +65,7 @@ export default function Login({ setUser }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button variant="contained" color="primary" onClick={handleLogin}>
+        <Button type="button" variant="contained" color="primary" onClick={handleLogin}>
           התחבר
         </Button>
       </Box>
