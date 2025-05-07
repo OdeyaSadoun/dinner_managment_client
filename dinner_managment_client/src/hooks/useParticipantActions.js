@@ -33,13 +33,15 @@ const useParticipantActions = (
       .get("http://localhost:8000/person/get_manual_people")
       .then((response) => {
         console.log("📦 תגובת שרת:", response.data);
-  
+
         const people = response.data.data.people;
         if (!people || people.length === 0) {
-          enqueueSnackbar("לא נמצאו משתתפים ידניים להורדה.", { variant: "info" });
+          enqueueSnackbar("לא נמצאו משתתפים ידניים להורדה.", {
+            variant: "info",
+          });
           return;
         }
-  
+
         const worksheet = XLSX.utils.json_to_sheet(
           people.map((p) => ({
             שם: p.name,
@@ -52,10 +54,12 @@ const useParticipantActions = (
         );
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "משתתפים ידניים");
-  
-        const dateStr = new Date().toLocaleDateString("he-IL").replace(/\//g, "-");
+
+        const dateStr = new Date()
+          .toLocaleDateString("he-IL")
+          .replace(/\//g, "-");
         const filename = `משתתפים בכנס שהוספו באופן ידני - ${dateStr}.xlsx`;
-  
+
         XLSX.writeFile(workbook, filename);
         enqueueSnackbar("✅ הקובץ ירד בהצלחה!", { variant: "success" });
       })
@@ -64,7 +68,40 @@ const useParticipantActions = (
         enqueueSnackbar("אירעה שגיאה במהלך ההורדה", { variant: "error" });
       });
   };
-  
+
+  const handleCSVUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/person/import_csv",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        enqueueSnackbar("✅ ייבוא הצליח!", { variant: "success" });
+        // רענון רשימת המשתתפים:
+        fetchParticipants();
+      } else {
+        enqueueSnackbar("⚠️ ייבוא נכשל: " + (response.data.data?.error || ""), {
+          variant: "warning",
+        });
+      }
+    } catch (error) {
+      console.error("שגיאה בייבוא:", error);
+      enqueueSnackbar("❌ שגיאה בעת הייבוא", { variant: "error" });
+    }
+  };
 
   const handleOpenDialog = () => {
     setNewParticipant({
@@ -260,6 +297,7 @@ const useParticipantActions = (
     setDeleteDialogOpen,
     handleCheckboxChange,
     handleDownloadManualParticipants,
+    handleCSVUpload
   };
 };
 

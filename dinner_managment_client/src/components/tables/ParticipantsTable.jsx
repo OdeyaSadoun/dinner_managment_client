@@ -24,7 +24,8 @@ const ParticipantsTable = ({
   allowEdit,
   allowDelete,
   allowAdd,
-  handleDownloadManualParticipants
+  handleDownloadManualParticipants,
+  handleCSVUpload,
 }) => {
   const columns = getParticipantsColumns({
     admin,
