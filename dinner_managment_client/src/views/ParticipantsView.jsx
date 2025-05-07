@@ -42,7 +42,7 @@ const ParticipantsView = () => {
     setSnackbarSeverity,
     hasSearched,
     searchTerm,
-    setFilteredParticipants
+    setFilteredParticipants, 
   );
 
   const handlePrintLabel = usePrintLabel();
@@ -66,6 +66,7 @@ const ParticipantsView = () => {
         handleEditParticipant={admin ? actions.handleEditParticipant : undefined}
         confirmDeleteParticipant={admin ? actions.confirmDeleteParticipant : undefined}
         handleOpenDialog={admin ? actions.handleOpenDialog : undefined}
+        handleDownloadManualParticipants  = {actions.handleDownloadManualParticipants}
       />
 
       {admin && (

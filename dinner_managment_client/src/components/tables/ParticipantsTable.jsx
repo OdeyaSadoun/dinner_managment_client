@@ -5,6 +5,7 @@ import SearchBar from "../layouts/SearchBar";
 import getParticipantsColumns from "./ParticipantsColumns";
 import UploadIcon from "@mui/icons-material/Upload";
 import AddIcon from "@mui/icons-material/Add";
+import DownloadIcon from "@mui/icons-material/Download";
 
 const ParticipantsTable = ({
   participants,
@@ -23,6 +24,7 @@ const ParticipantsTable = ({
   allowEdit,
   allowDelete,
   allowAdd,
+  handleDownloadManualParticipants
 }) => {
   const columns = getParticipantsColumns({
     admin,
@@ -54,7 +56,15 @@ const ParticipantsTable = ({
 
         {allowAdd && (
           <Box sx={{ display: "flex", gap: 1 }}>
-            {/* כפתור הוספה בירוק */}
+            <Button
+              variant="text"
+              color="info"
+              onClick={handleDownloadManualParticipants}
+              sx={{ minWidth: 0, p: 1 }}
+            >
+              <DownloadIcon />
+            </Button>
+
             <Button
               variant="text"
               color="success"
@@ -64,7 +74,6 @@ const ParticipantsTable = ({
               <AddIcon />
             </Button>
 
-            {/* כפתור ייבוא מ־CSV בסגול */}
             <Button
               variant="text"
               component="label"

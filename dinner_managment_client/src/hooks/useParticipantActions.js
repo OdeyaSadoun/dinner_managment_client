@@ -1,16 +1,18 @@
 import { useState } from "react";
 import axios from "axios";
+import * as XLSX from "xlsx";
+import { useSnackbar } from "notistack";
 
 const useParticipantActions = (
-    setParticipants,
-    tableMapping,
-    setSnackbarOpen,
-    setSnackbarMessage,
-    setSnackbarSeverity,
-    hasSearched,
-    searchTerm,
-    setFilteredParticipants
-  ) => {
+  setParticipants,
+  tableMapping,
+  setSnackbarOpen,
+  setSnackbarMessage,
+  setSnackbarSeverity,
+  hasSearched,
+  searchTerm,
+  setFilteredParticipants
+) => {
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [participantToDelete, setParticipantToDelete] = useState(null);
@@ -23,6 +25,46 @@ const useParticipantActions = (
     contact_person: "",
     add_manual: true,
   });
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleDownloadManualParticipants = () => {
+    console.log("⏬ התחלת הורדה");
+    axios
+      .get("http://localhost:8000/person/get_manual_people")
+      .then((response) => {
+        console.log("📦 תגובת שרת:", response.data);
+  
+        const people = response.data.data.people;
+        if (!people || people.length === 0) {
+          enqueueSnackbar("לא נמצאו משתתפים ידניים להורדה.", { variant: "info" });
+          return;
+        }
+  
+        const worksheet = XLSX.utils.json_to_sheet(
+          people.map((p) => ({
+            שם: p.name,
+            טלפון: p.phone,
+            "מספר שולחן": p.table_number,
+            מגדר: p.gender === "male" ? "גבר" : "אישה",
+            "איש קשר": p.contact_person,
+            "הגיע לדינר?": p.is_reach_the_dinner ? "✔" : "",
+          }))
+        );
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "משתתפים ידניים");
+  
+        const dateStr = new Date().toLocaleDateString("he-IL").replace(/\//g, "-");
+        const filename = `משתתפים בכנס שהוספו באופן ידני - ${dateStr}.xlsx`;
+  
+        XLSX.writeFile(workbook, filename);
+        enqueueSnackbar("✅ הקובץ ירד בהצלחה!", { variant: "success" });
+      })
+      .catch((error) => {
+        console.error("❌ שגיאה בהורדה:", error);
+        enqueueSnackbar("אירעה שגיאה במהלך ההורדה", { variant: "error" });
+      });
+  };
+  
 
   const handleOpenDialog = () => {
     setNewParticipant({
@@ -217,6 +259,7 @@ const useParticipantActions = (
     handleDeleteParticipant,
     setDeleteDialogOpen,
     handleCheckboxChange,
+    handleDownloadManualParticipants,
   };
 };
 
