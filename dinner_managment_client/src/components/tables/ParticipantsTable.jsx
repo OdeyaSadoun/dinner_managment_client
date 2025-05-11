@@ -25,7 +25,7 @@ const ParticipantsTable = ({
   allowEdit,
   allowDelete,
   allowAdd,
-  handleDownloadManualParticipants,
+  handleDownloadAllParticipants,
   handleCSVUpload,
   csvLoading
 }) => {
@@ -64,7 +64,7 @@ const ParticipantsTable = ({
             <Button
               variant="text"
               color="info"
-              onClick={handleDownloadManualParticipants}
+              onClick={handleDownloadAllParticipants}
               sx={{ minWidth: 0, p: 1 }}
             >
               <DownloadIcon />

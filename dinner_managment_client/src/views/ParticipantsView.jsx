@@ -72,7 +72,7 @@ const ParticipantsView = () => {
         handleEditParticipant={admin ? actions.handleEditParticipant : undefined}
         confirmDeleteParticipant={admin ? actions.confirmDeleteParticipant : undefined}
         handleOpenDialog={admin ? actions.handleOpenDialog : undefined}
-        handleDownloadManualParticipants={actions.handleDownloadManualParticipants}
+        handleDownloadAllParticipants={actions.handleDownloadAllParticipants}
         handleCSVUpload={handleCSVUpload}
       />
 

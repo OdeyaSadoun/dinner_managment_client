@@ -29,16 +29,17 @@ const useParticipantActions = (
   });
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleDownloadManualParticipants = () => {
-    console.log("⏬ התחלת הורדה");
+  const handleDownloadAllParticipants = () => {
+    console.log("⏬ התחלת הורדה של כל המשתתפים");
+
     axios
-      .get("http://localhost:8000/person/get_manual_people")
+      .get("http://localhost:8000/person") // הנחה: זה מביא את כל האנשים
       .then((response) => {
         console.log("📦 תגובת שרת:", response.data);
 
         const people = response.data.data.people;
         if (!people || people.length === 0) {
-          enqueueSnackbar("לא נמצאו משתתפים ידניים להורדה.", {
+          enqueueSnackbar("לא נמצאו משתתפים במערכת.", {
             variant: "info",
           });
           return;
@@ -47,20 +48,22 @@ const useParticipantActions = (
         const worksheet = XLSX.utils.json_to_sheet(
           people.map((p) => ({
             שם: p.name,
-            טלפון: p.phone,
-            "מספר שולחן": p.table_number,
+            טלפון: p.phone || "",
+            "מספר שולחן": p.table_number ?? "",
             מגדר: p.gender === "male" ? "גבר" : "אישה",
-            "איש קשר": p.contact_person,
+            "איש קשר": p.contact_person || "",
             "הגיע לדינר?": p.is_reach_the_dinner ? "✔" : "",
+            "אופן הוספה": p.add_manual ? "ידני" : "אוטומטי",
           }))
         );
+
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "משתתפים ידניים");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "כל המשתתפים");
 
         const dateStr = new Date()
           .toLocaleDateString("he-IL")
           .replace(/\//g, "-");
-        const filename = `משתתפים בכנס שהוספו באופן ידני - ${dateStr}.xlsx`;
+        const filename = `כל המשתתפים בדינר - ${dateStr}.xlsx`;
 
         XLSX.writeFile(workbook, filename);
         enqueueSnackbar("✅ הקובץ ירד בהצלחה!", { variant: "success" });
@@ -126,7 +129,7 @@ const useParticipantActions = (
       const token = localStorage.getItem("token");
       const payload = {
         ...newParticipant,
-        add_manual: true, 
+        add_manual: true,
       };
 
       const response = await axios.post(
@@ -316,7 +319,7 @@ const useParticipantActions = (
     handleDeleteParticipant,
     setDeleteDialogOpen,
     handleCheckboxChange,
-    handleDownloadManualParticipants,
+    handleDownloadAllParticipants,
     handleCSVUpload,
     csvLoading,
   };
