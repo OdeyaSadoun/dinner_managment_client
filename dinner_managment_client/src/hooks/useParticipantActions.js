@@ -140,7 +140,7 @@ const useParticipantActions = (
       if (response.data.status === "success") {
         console.log(response.data.data);
 
-        setParticipants((prev) => [...prev, response.data.data]);
+        await fetchParticipants(); // ✅ מרנדר מחדש הכל עם הנתונים המלאים וה-ID הנכון
         setNewParticipant({
           name: "",
           phone: "",
