@@ -11,7 +11,8 @@ const useParticipantActions = (
   setSnackbarSeverity,
   hasSearched,
   searchTerm,
-  setFilteredParticipants
+  setFilteredParticipants,
+  fetchParticipants
 ) => {
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -89,8 +90,7 @@ const useParticipantActions = (
       );
 
       if (response.data.status === "success") {
-        enqueueSnackbar("✅ ייבוא הצליח!", { variant: "success" });
-        // רענון רשימת המשתתפים:
+        alert("✅ ייבוא הצליח!");
         fetchParticipants();
       } else {
         enqueueSnackbar("⚠️ ייבוא נכשל: " + (response.data.data?.error || ""), {
@@ -160,6 +160,9 @@ const useParticipantActions = (
   const handleEditParticipant = (participant) => {
     setNewParticipant({
       ...participant,
+      phone: participant.phone || null,
+      contact_person: participant.contact_person || null,
+      add_manual: participant.add_manual ?? true,
       id: participant.id || participant._id,
     });
     setOpen(true);
@@ -168,18 +171,30 @@ const useParticipantActions = (
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log(newParticipant);
+
+      // מסנכרן את הפורמט לשרת לפי המודל
+      const sanitizedParticipant = {
+        name: newParticipant.name,
+        phone: newParticipant.phone || null,
+        table_number: parseInt(newParticipant.table_number),
+        is_reach_the_dinner: newParticipant.is_reach_the_dinner,
+        gender: newParticipant.gender,
+        contact_person: newParticipant.contact_person || null,
+        add_manual: newParticipant.add_manual ?? false,
+      };
 
       const response = await axios.put(
         `http://localhost:8000/person/${newParticipant.id}`,
-        newParticipant,
+        sanitizedParticipant,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.data.status === "success") {
         setParticipants((prev) =>
           prev.map((participant) =>
-            participant.id === newParticipant.id ? newParticipant : participant
+            participant.id === newParticipant.id
+              ? { ...response.data.data }
+              : participant
           )
         );
         handleCloseDialog();
@@ -297,7 +312,7 @@ const useParticipantActions = (
     setDeleteDialogOpen,
     handleCheckboxChange,
     handleDownloadManualParticipants,
-    handleCSVUpload
+    handleCSVUpload,
   };
 };
 

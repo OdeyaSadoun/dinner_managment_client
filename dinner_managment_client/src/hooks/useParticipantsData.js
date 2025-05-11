@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 const useParticipantsData = () => {
@@ -8,45 +8,49 @@ const useParticipantsData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // קודם שולחנות
-        const tableRes = await axios.get("http://localhost:8000/table");
-        if (
-          tableRes.data.status === "success" &&
-          Array.isArray(tableRes.data.data.tables)
-        ) {
-          const fetchedTables = tableRes.data.data.tables;
-          setTables(fetchedTables);
+  // ✅ הפונקציה מועברת ל-useCallback כדי שלא תשתנה כל הזמן
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
 
-          const mapping = fetchedTables.reduce((acc, table) => {
-            acc[table.table_number] = table.id;
-            return acc;
-          }, {});
-          setTableMapping(mapping);
-        }
+      // קריאה לטבלאות
+      const tableRes = await axios.get("http://localhost:8000/table");
+      if (
+        tableRes.data.status === "success" &&
+        Array.isArray(tableRes.data.data.tables)
+      ) {
+        const fetchedTables = tableRes.data.data.tables;
+        setTables(fetchedTables);
 
-        // רק אחרי זה משתתפים
-        const peopleRes = await axios.get("http://localhost:8000/person");
-        if (
-          peopleRes.data.status === "success" &&
-          Array.isArray(peopleRes.data.data.people)
-        ) {
-          setParticipants(peopleRes.data.data.people);
-        } else {
-          setError("Failed to fetch participants.");
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("An error occurred while fetching data.");
-      } finally {
-        setLoading(false);
+        const mapping = fetchedTables.reduce((acc, table) => {
+          acc[table.table_number] = table.id;
+          return acc;
+        }, {});
+        setTableMapping(mapping);
       }
-    };
 
-    fetchData();
+      // קריאה לאנשים
+      const peopleRes = await axios.get("http://localhost:8000/person");
+      if (
+        peopleRes.data.status === "success" &&
+        Array.isArray(peopleRes.data.data.people)
+      ) {
+        setParticipants(peopleRes.data.data.people);
+      } else {
+        setError("Failed to fetch participants.");
+      }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError("An error occurred while fetching data.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  // הפעלת הקריאה הראשונה
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return {
     participants,
@@ -55,6 +59,7 @@ const useParticipantsData = () => {
     tableMapping,
     loading,
     error,
+    fetchParticipants: fetchData, // ✅ מחזירים את הפונקציה
   };
 };
 

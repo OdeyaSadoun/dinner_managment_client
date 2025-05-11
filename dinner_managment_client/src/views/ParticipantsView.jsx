@@ -16,6 +16,7 @@ const ParticipantsView = () => {
     tableMapping,
     loading,
     error,
+    fetchParticipants
   } = useParticipantsData();
   const admin = isAdmin();
 
@@ -43,6 +44,7 @@ const ParticipantsView = () => {
     hasSearched,
     searchTerm,
     setFilteredParticipants, 
+    fetchParticipants 
   );
 
   const handlePrintLabel = usePrintLabel();
