@@ -12,14 +12,8 @@ export const isTokenExpired = () => {
     if (exp > 9999999999) {
       exp = exp / 1000; // להמיר לשניות
     }
-
     const now = Date.now() / 1000;
     const expired = exp < now;
-
-    console.log("🕒 זמן נוכחי:", now);
-    console.log("📅 תוקף הטוקן:", exp);
-    console.log("⏰ פג תוקף?", expired);
-
     return expired;
   } catch (error) {
     console.error("❌ שגיאה בפענוח הטוקן:", error);

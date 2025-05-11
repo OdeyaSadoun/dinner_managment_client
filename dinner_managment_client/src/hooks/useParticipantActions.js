@@ -185,21 +185,23 @@ const useParticipantActions = (
         contact_person: newParticipant.contact_person || null,
         add_manual: newParticipant.add_manual ?? false,
       };
+      console.log(sanitizedParticipant);
+      console.log("🟢 newParticipant:", newParticipant);
+      console.log("🧼 sanitizedParticipant:", sanitizedParticipant);
+      console.log(
+        "📡 URL שנשלחת:",
+        `http://localhost:8000/person/${newParticipant.id}`
+      );
 
       const response = await axios.put(
         `http://localhost:8000/person/${newParticipant.id}`,
         sanitizedParticipant,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log(response.data);
 
       if (response.data.status === "success") {
-        setParticipants((prev) =>
-          prev.map((participant) =>
-            participant.id === newParticipant.id
-              ? { ...response.data.data }
-              : participant
-          )
-        );
+        await fetchParticipants();
         handleCloseDialog();
       }
     } catch (error) {
@@ -316,7 +318,7 @@ const useParticipantActions = (
     handleCheckboxChange,
     handleDownloadManualParticipants,
     handleCSVUpload,
-    csvLoading
+    csvLoading,
   };
 };
 

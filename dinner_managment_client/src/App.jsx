@@ -52,7 +52,9 @@ export default function App() {
     if (token && !isTokenExpired(token)) {
       console.log("✅ טוקן בתוקף");
       setUser(username);
-      setIsAdminUser(checkIfAdmin(token));
+      const admin = checkIfAdmin(token);
+      console.log(admin);
+      setIsAdminUser(admin);
     } else {
       console.warn("⚠️ טוקן חסר או פג תוקף. מתנתקים.");
       localStorage.removeItem("token");
