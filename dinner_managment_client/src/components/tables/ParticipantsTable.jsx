@@ -6,6 +6,7 @@ import getParticipantsColumns from "./ParticipantsColumns";
 import UploadIcon from "@mui/icons-material/Upload";
 import AddIcon from "@mui/icons-material/Add";
 import DownloadIcon from "@mui/icons-material/Download";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const ParticipantsTable = ({
   participants,
@@ -26,6 +27,7 @@ const ParticipantsTable = ({
   allowAdd,
   handleDownloadManualParticipants,
   handleCSVUpload,
+  csvLoading
 }) => {
   const columns = getParticipantsColumns({
     admin,
@@ -41,6 +43,8 @@ const ParticipantsTable = ({
 
   return (
     <>
+      {csvLoading && <LinearProgress sx={{ mb: 2 }} />}
+
       <Typography variant="h4" align="center" gutterBottom>
         משתתפים בדינר
       </Typography>

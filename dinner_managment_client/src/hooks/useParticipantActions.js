@@ -15,6 +15,7 @@ const useParticipantActions = (
   fetchParticipants
 ) => {
   const [open, setOpen] = useState(false);
+  const [csvLoading, setCsvLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [participantToDelete, setParticipantToDelete] = useState(null);
   const [newParticipant, setNewParticipant] = useState({
@@ -77,6 +78,8 @@ const useParticipantActions = (
     const formData = new FormData();
     formData.append("file", file);
 
+    setCsvLoading(true); // ⏳ התחלת ייבוא
+
     try {
       const response = await axios.post(
         "http://localhost:8000/person/import_csv",
@@ -91,15 +94,15 @@ const useParticipantActions = (
 
       if (response.data.status === "success") {
         alert("✅ ייבוא הצליח!");
-        fetchParticipants();
+        await fetchParticipants();
       } else {
-        enqueueSnackbar("⚠️ ייבוא נכשל: " + (response.data.data?.error || ""), {
-          variant: "warning",
-        });
+        alert("⚠️ ייבוא נכשל: " + (response.data.data?.error || ""));
       }
     } catch (error) {
       console.error("שגיאה בייבוא:", error);
-      enqueueSnackbar("❌ שגיאה בעת הייבוא", { variant: "error" });
+      alert("❌ שגיאה בעת הייבוא");
+    } finally {
+      setCsvLoading(false); // ✅ סיום ייבוא
     }
   };
 
@@ -313,6 +316,7 @@ const useParticipantActions = (
     handleCheckboxChange,
     handleDownloadManualParticipants,
     handleCSVUpload,
+    csvLoading
   };
 };
 

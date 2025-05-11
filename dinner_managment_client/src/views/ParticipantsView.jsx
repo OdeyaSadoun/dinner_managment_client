@@ -35,7 +35,11 @@ const ParticipantsView = () => {
     setHasSearched(term !== "");
   };
 
-  const actions = useParticipantActions(
+  const {
+    handleCSVUpload,
+    csvLoading, // ✅ כאן תוסיפי
+    ...actions // שאר הפונקציות והסטייטים
+  } = useParticipantActions(
     setParticipants,
     tableMapping,
     setSnackbarOpen,
@@ -43,10 +47,9 @@ const ParticipantsView = () => {
     setSnackbarSeverity,
     hasSearched,
     searchTerm,
-    setFilteredParticipants, 
-    fetchParticipants 
+    setFilteredParticipants,
+    fetchParticipants
   );
-
   const handlePrintLabel = usePrintLabel();
 
   return (
@@ -55,6 +58,7 @@ const ParticipantsView = () => {
         participants={participants}
         filteredParticipants={hasSearched ? filteredParticipants : participants}
         loading={loading}
+        csvLoading={csvLoading}
         error={error}
         admin={admin}
         allowPrint={true}
@@ -68,8 +72,8 @@ const ParticipantsView = () => {
         handleEditParticipant={admin ? actions.handleEditParticipant : undefined}
         confirmDeleteParticipant={admin ? actions.confirmDeleteParticipant : undefined}
         handleOpenDialog={admin ? actions.handleOpenDialog : undefined}
-        handleDownloadManualParticipants  = {actions.handleDownloadManualParticipants}
-        handleCSVUpload = {actions.handleCSVUpload}
+        handleDownloadManualParticipants={actions.handleDownloadManualParticipants}
+        handleCSVUpload={handleCSVUpload}
       />
 
       {admin && (
