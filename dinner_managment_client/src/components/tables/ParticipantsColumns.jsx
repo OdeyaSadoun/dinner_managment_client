@@ -21,11 +21,11 @@ const getParticipantsColumns = ({
       headerName: "הגיע לדינר?",
       flex: 0.8,
       renderCell: (params) => (
-        <Checkbox
-          checked={params.row.is_reach_the_dinner || false}
-          onChange={() => handleCheckboxChange(params.row)}
-          disabled={!allowCheckbox}
-        />
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+          <Typography variant="body2" color={params.row.is_reach_the_dinner ? "success.main" : "text.secondary"}>
+            {params.row.is_reach_the_dinner ? "✔" : ""}
+          </Typography>
+        </Box>
       ),
     },
     {

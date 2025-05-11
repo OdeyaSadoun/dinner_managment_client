@@ -50,7 +50,7 @@ const ParticipantsView = () => {
     setFilteredParticipants,
     fetchParticipants
   );
-  const handlePrintLabel = usePrintLabel();
+  const handlePrintLabel = usePrintLabel(tableMapping, fetchParticipants);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 8, minHeight: '80vh' }}>
