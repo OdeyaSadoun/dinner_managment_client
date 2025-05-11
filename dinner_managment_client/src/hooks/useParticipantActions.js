@@ -126,7 +126,7 @@ const useParticipantActions = (
       const token = localStorage.getItem("token");
       const payload = {
         ...newParticipant,
-        add_manual: true, // מכריח שזה יהיה true
+        add_manual: true, 
       };
 
       const response = await axios.post(
@@ -140,7 +140,7 @@ const useParticipantActions = (
       if (response.data.status === "success") {
         console.log(response.data.data);
 
-        await fetchParticipants(); // ✅ מרנדר מחדש הכל עם הנתונים המלאים וה-ID הנכון
+        await fetchParticipants();
         setNewParticipant({
           name: "",
           phone: "",
