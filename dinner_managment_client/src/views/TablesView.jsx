@@ -8,6 +8,7 @@ import AddAndEditTableDialog from "../components/dialogs/AddAndEditTableDialog";
 import TablesLayout from "../components/layouts/TablesLayout";
 import isAdmin from "../utils/auth";
 import { Snackbar, Alert as MuiAlert } from "@mui/material";
+import useUploadTablesCsv from "../hooks/useUploadTablesCSV";
 
 
 export default function TablesView() {
@@ -16,12 +17,13 @@ export default function TablesView() {
   const tableActions = useTableActions(setTables);
   const admin = isAdmin();
   console.log(admin);
+  const { handleUploadTablesCsv } = useUploadTablesCsv(setTables);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 8, mb: 4, minHeight: "calc(100vh - 200px)" }}>
       <TablesLayout
         tables={tables}
-        setTables={setTables} // ⬅️ תוסיפי את השורה הזו
+        setTables={setTables}
         handleOpenDialog={admin ? tableActions.handleOpenDialog : undefined}
         handleDragStart={admin ? handleDragStart : undefined}
         handleDragOver={admin ? handleDragOver : undefined}
@@ -30,6 +32,7 @@ export default function TablesView() {
         handleChairClick={tableActions.handleChairClick}
         admin={admin}
         onTableClick={admin ? tableActions.handleTableClick : undefined}
+        handleUploadTablesCsv={admin ? handleUploadTablesCsv : undefined}
       />
 
       {admin && (

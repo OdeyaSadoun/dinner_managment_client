@@ -16,8 +16,9 @@ const TablesLayout = ({
     admin,
     setTables,
     onTableClick,
+    handleUploadTablesCsv,
 }) => {
-    const MIN_SCALE = 0.5;
+    const MIN_SCALE = 0.4;
     const isClickRef = useRef(true);
     const [scale, setScale] = useState(MIN_SCALE);
     const scrollContainerRef = useRef(null);
@@ -51,9 +52,24 @@ const TablesLayout = ({
         <Box sx={{ mt: 2, mb: 4, position: "relative", height: "calc(100vh - 180px)" }}>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                 {admin && (
-                    <Button variant="contained" color="primary" onClick={handleOpenDialog}>
-                        הוסף שולחן
-                    </Button>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+                        <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+                            הוסף שולחן
+                        </Button>
+                        <label htmlFor="upload-tables-csv">
+                            <input
+                                id="upload-tables-csv"
+                                type="file"
+                                accept=".csv"
+                                style={{ display: "none" }}
+                                onChange={handleUploadTablesCsv}
+                            />
+                            <Button variant="outlined" component="span">
+                                העלאת CSV שולחנות
+                            </Button>
+                        </label>
+
+                    </div>
                 )}
 
                 <Stack direction="row" alignItems="center" spacing={2}>
