@@ -139,7 +139,8 @@ const useParticipantActions = (
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+      console.log(response.data);
+      
       if (response.data.status === "success") {
         console.log(response.data.data);
 
