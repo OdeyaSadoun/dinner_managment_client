@@ -12,6 +12,7 @@ const Table = styled(Box)(({ shape, gender }) => ({
   border: "2px solid #000",
   cursor: "grab",
   position: "absolute",
+  rotation: 0 // במעלות
 }));
 
 export default Table;

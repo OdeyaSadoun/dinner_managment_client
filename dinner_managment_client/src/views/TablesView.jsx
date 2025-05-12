@@ -21,6 +21,7 @@ export default function TablesView() {
     <Container maxWidth="lg" sx={{ mt: 8, mb: 4, minHeight: "calc(100vh - 200px)" }}>
       <TablesLayout
         tables={tables}
+        setTables={setTables} // ⬅️ תוסיפי את השורה הזו
         handleOpenDialog={admin ? tableActions.handleOpenDialog : undefined}
         handleDragStart={admin ? handleDragStart : undefined}
         handleDragOver={admin ? handleDragOver : undefined}
@@ -29,6 +30,7 @@ export default function TablesView() {
         handleChairClick={tableActions.handleChairClick}
         admin={admin}
       />
+
       {admin && (
         <AddTableDialog
           open={tableActions.openDialog}
