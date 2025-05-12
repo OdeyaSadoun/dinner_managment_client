@@ -207,11 +207,11 @@ const TablesLayout = ({
                                     onDragStart={(e) => handleDragStart(e, table.id, scale)}
                                     onMouseDown={() => { isClickRef.current = true; }}
                                     onMouseMove={() => { isClickRef.current = false; }}
-                                    onMouseUp={() => {
-                                        if (isClickRef.current && onTableClick) {
-                                            onTableClick(table);
+                                    onDoubleClick={() => {
+                                        if (onTableClick) {
+                                          onTableClick(table);
                                         }
-                                    }}
+                                      }}                                      
                                 >
                                     <Typography align="center" sx={{ fontSize: 30 }}>
                                         {table.table_number}

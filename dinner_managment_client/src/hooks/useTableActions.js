@@ -30,25 +30,35 @@ const useTableActions = (setTables) => {
     setChairs(table.chairs);
     setTableShape(table.shape);
     setTableGender(table.gender);
-    setIsEditMode(false); // ❗ חשוב מאוד שיהיה false
+    setIsEditMode(true); // ← תמיד נכנס למצב עריכה
     setOpenDialog(true);
-  };  
+  };
 
   const handleUpdateTable = async () => {
     if (!selectedTable) return;
-  
+
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token not found");
-  
+
       const updatedTable = {
-        table_number: Number(tableNumber),
-        chairs: Number(chairs),
+        table_number: tableNumber,
+        chairs: chairs,
         shape: tableShape,
         gender: tableGender,
-        people_list: selectedTable.people_list, // לשמור על הקיים
-        position: selectedTable.position,       // לשמור על הקיים
+        position: selectedTable?.position || { x: 0, y: 0 },
+        rotation: selectedTable?.rotation || 0,
+        is_active: selectedTable?.is_active ?? true,
+        people_list: (selectedTable?.people_list || []).map((p) => ({
+          id: p.id,
+          name: p.name,
+          gender: p.gender,
+          table_number: p.table_number,
+          is_reach_the_dinner: p.is_reach_the_dinner,
+          is_active: p.is_active,
+        })),
       };
+
       console.log("📦 updatedTable:", updatedTable);
 
       const response = await axios.put(
@@ -58,7 +68,8 @@ const useTableActions = (setTables) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+      console.log(response.data);
+
       if (response.data.status === "success") {
         setTables((prev) =>
           prev.map((t) =>
@@ -77,7 +88,6 @@ const useTableActions = (setTables) => {
       setSnackbarOpen(true);
     }
   };
-  
 
   const handleAddTable = async () => {
     if (!tableNumber) {
@@ -144,29 +154,53 @@ const useTableActions = (setTables) => {
 
   const handleDeleteTable = async () => {
     if (!tableToDelete) return;
-
+  
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
-
-      await axios.patch(
+  
+      const response = await axios.patch(
         `http://localhost:8000/table/delete/${tableToDelete}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      setTables((prev) => prev.filter((table) => table.id !== tableToDelete));
+      console.log(response.data);
+  
+      if (response.data.status === "success") {
+        setTables((prev) =>
+          prev.filter((table) => table.id !== tableToDelete)
+        );
+        setSnackbarMessage("השולחן נמחק בהצלחה.");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+      } else {
+        const messageFromServer = response.data?.data?.error_message;
+        if (messageFromServer === "לא ניתן למחוק שולחן עם אנשים משובצים.") {
+          setSnackbarMessage(messageFromServer);
+        } else {
+          setSnackbarMessage("אירעה שגיאה במחיקת השולחן.");
+        }
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
     } catch (error) {
       console.error("Error deleting table:", error);
-      alert("Failed to delete table. Please try again.");
+      const messageFromServer = error.response?.data?.data;
+      if (messageFromServer === "לא ניתן למחוק שולחן עם אנשים משובצים.") {
+        setSnackbarMessage(messageFromServer);
+      } else {
+        setSnackbarMessage("אירעה שגיאה במחיקת השולחן.");
+      }
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     } finally {
       setDeleteDialogOpen(false);
       setTableToDelete(null);
     }
   };
-
+  
   return {
     openDialog,
     setOpenDialog, // מחזירים כדי שיהיה אפשר לשנות מחוץ ל-hook
@@ -196,7 +230,7 @@ const useTableActions = (setTables) => {
     setSelectedTable,
     isEditMode,
     setIsEditMode,
-    handleUpdateTable
+    handleUpdateTable,
   };
 };
 
