@@ -3,6 +3,8 @@ import { Box, Typography, Button, Slider, Stack } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Chair from "../../style/Chair";
 import Table from "../../style/Table";
+import { Tooltip } from "@mui/material";
+
 
 const TablesLayout = ({
     tables,
@@ -55,14 +57,18 @@ const TablesLayout = ({
                 )}
 
                 <Stack direction="row" alignItems="center" spacing={2}>
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => setScale((prev) => Math.min(prev + 0.1, 1.5))}
-                        disabled={scale >= 1.5}
-                    >
-                        +
-                    </Button>
+                    <Tooltip title="הגדל">
+                        <span>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={() => setScale((prev) => Math.min(prev + 0.1, 1.5))}
+                                disabled={scale >= 1.5}
+                            >
+                                +
+                            </Button>
+                        </span>
+                    </Tooltip>
 
                     <Box width={200}>
                         <Typography variant="caption">קנה מידה:</Typography>
@@ -76,14 +82,18 @@ const TablesLayout = ({
                         />
                     </Box>
 
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => setScale((prev) => Math.max(prev - 0.1, MIN_SCALE))}
-                        disabled={scale <= MIN_SCALE}
-                    >
-                        −
-                    </Button>
+                    <Tooltip title="הקטן">
+                        <span>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={() => setScale((prev) => Math.max(prev - 0.1, MIN_SCALE))}
+                                disabled={scale <= MIN_SCALE}
+                            >
+                                −
+                            </Button>
+                        </span>
+                    </Tooltip>
 
                     <Button variant="outlined" size="small" onClick={handleResetZoom}>
                         איפוס זום
