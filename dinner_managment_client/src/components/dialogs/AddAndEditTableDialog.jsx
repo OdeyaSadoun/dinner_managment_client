@@ -74,6 +74,24 @@ const AddAndEditTableDialog = ({
           >
             מלבן
           </Button>
+          <Button
+            variant={tableShape === "vip" ? "contained" : "outlined"}
+            onClick={() => setTableShape("vip")}
+          >
+            VIP
+          </Button>
+          <Button
+            variant={tableShape === "bima" ? "contained" : "outlined"}
+            onClick={() => setTableShape("bima")}
+          >
+            בימת כבוד
+          </Button>
+          <Button
+            variant={tableShape === "reserva" ? "contained" : "outlined"}
+            onClick={() => setTableShape("reserva")}
+          >
+            רזרבה
+          </Button>
         </Box>
 
         <Typography sx={{ mt: 2 }}>בחר מגדר:</Typography>
