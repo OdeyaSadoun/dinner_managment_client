@@ -55,6 +55,15 @@ const TablesLayout = ({
                 )}
 
                 <Stack direction="row" alignItems="center" spacing={2}>
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setScale((prev) => Math.min(prev + 0.1, 1.5))}
+                        disabled={scale >= 1.5}
+                    >
+                        +
+                    </Button>
+
                     <Box width={200}>
                         <Typography variant="caption">קנה מידה:</Typography>
                         <Slider
@@ -66,10 +75,21 @@ const TablesLayout = ({
                             aria-labelledby="scale-slider"
                         />
                     </Box>
+
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setScale((prev) => Math.max(prev - 0.1, MIN_SCALE))}
+                        disabled={scale <= MIN_SCALE}
+                    >
+                        −
+                    </Button>
+
                     <Button variant="outlined" size="small" onClick={handleResetZoom}>
                         איפוס זום
                     </Button>
                 </Stack>
+
             </Box>
 
             <Box
