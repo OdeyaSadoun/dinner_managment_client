@@ -18,7 +18,7 @@ export default function TablesView() {
   console.log(admin);
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 8, height: "80vh", position: "relative" }}>
+    <Container maxWidth="lg" sx={{ mt: 8, mb: 4, minHeight: "calc(100vh - 200px)" }}>
       <TablesLayout
         tables={tables}
         handleOpenDialog={admin ? tableActions.handleOpenDialog : undefined}
