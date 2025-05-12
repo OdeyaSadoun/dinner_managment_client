@@ -18,6 +18,8 @@ const TablesLayout = ({
     onTableClick,
     handleUploadTablesCsv,
 }) => {
+    console.log(tables);
+
     const MIN_SCALE = 0.4;
     const isClickRef = useRef(true);
     const [scale, setScale] = useState(MIN_SCALE);
@@ -154,6 +156,7 @@ const TablesLayout = ({
                                     transformOrigin: "center center",
                                 }}
                             >
+
                                 <Table
                                     shape={table.shape}
                                     gender={table.gender}
@@ -166,17 +169,10 @@ const TablesLayout = ({
                                             onTableClick(table);
                                         }
                                     }}
-                                    style={{ cursor: "grab" }}
-                                    sx={{
-                                        position: "relative",
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                    }}
                                 >
+                                    {console.log(table)}
                                     <Typography variant="subtitle2" align="center">
-                                        שולחן {table.table_number}
+                                        {table.table_number}
                                     </Typography>
 
                                     {admin && (
@@ -231,8 +227,31 @@ const TablesLayout = ({
                                     {(() => {
                                         const shape = table.shape;
                                         const chairs = [];
+                                        if (shape === "bima") {
+                                            const width = 140 * 4;
+                                            const height = 80 / 2;
+                                            const padding = 10;
+                                            const people = Array.isArray(table.people_list) ? table.people_list : [];
 
-                                        if (shape === "circle") {
+                                            for (let i = 0; i < table.chairs; i++) {
+                                                const person = people[i];
+                                                chairs.push(
+                                                    <Chair
+                                                        key={`${table.id}-chair-${i}`}
+                                                        isOccupied={!!person}
+                                                        sx={{
+                                                            top: height + padding,
+                                                            left: ((i + 1) * width) / (table.chairs + 1),
+                                                            position: "absolute",
+                                                            transform: "translate(-50%, -50%)",
+                                                        }}
+                                                        onClick={() => person && handleChairClick(person)}
+                                                    />
+                                                );
+                                            }
+                                        }
+
+                                        else if (shape === "circle") {
                                             const radius = 60;
                                             for (let i = 0; i < table.chairs; i++) {
                                                 const angle = (360 / table.chairs) * i;
@@ -253,18 +272,22 @@ const TablesLayout = ({
                                                     />
                                                 );
                                             }
-                                        } else if (shape === "rectangle") {
-                                            const width = 140;
+                                        } if (shape === "rectangle") {
+                                            const baseWidth = 140;
+                                            const width = baseWidth * 2;
                                             const height = 80;
                                             const padding = 10;
+                                            const people = Array.isArray(table.people_list) ? table.people_list : [];
+
                                             const shortSideChairs = 2;
                                             const remaining = table.chairs - shortSideChairs * 2;
                                             const topChairs = Math.ceil(remaining / 2);
                                             const bottomChairs = Math.floor(remaining / 2);
                                             let index = 0;
 
+                                            // Left
                                             for (let i = 0; i < shortSideChairs; i++, index++) {
-                                                const person = table.people_list[index];
+                                                const person = people[index];
                                                 chairs.push(
                                                     <Chair
                                                         key={`${table.id}-chair-left-${i}`}
@@ -280,8 +303,9 @@ const TablesLayout = ({
                                                 );
                                             }
 
+                                            // Right
                                             for (let i = 0; i < shortSideChairs; i++, index++) {
-                                                const person = table.people_list[index];
+                                                const person = people[index];
                                                 chairs.push(
                                                     <Chair
                                                         key={`${table.id}-chair-right-${i}`}
@@ -297,8 +321,9 @@ const TablesLayout = ({
                                                 );
                                             }
 
+                                            // Top
                                             for (let i = 0; i < topChairs; i++, index++) {
-                                                const person = table.people_list[index];
+                                                const person = people[index];
                                                 chairs.push(
                                                     <Chair
                                                         key={`${table.id}-chair-top-${i}`}
@@ -314,8 +339,9 @@ const TablesLayout = ({
                                                 );
                                             }
 
+                                            // Bottom
                                             for (let i = 0; i < bottomChairs; i++, index++) {
-                                                const person = table.people_list[index];
+                                                const person = people[index];
                                                 chairs.push(
                                                     <Chair
                                                         key={`${table.id}-chair-bottom-${i}`}
@@ -330,7 +356,8 @@ const TablesLayout = ({
                                                     />
                                                 );
                                             }
-                                        } else if (shape === "square") {
+                                        }
+                                        else if (shape === "square" || shape === "vip" || shape === "reserva") {
                                             const width = 100;
                                             const height = 100;
                                             const sides = 4;
@@ -375,7 +402,6 @@ const TablesLayout = ({
                                                 );
                                             }
                                         }
-
                                         return chairs;
                                     })()}
                                 </Table>

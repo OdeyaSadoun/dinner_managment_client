@@ -8,7 +8,11 @@ const useTablesData = () => {
     const fetchTables = async () => {
       try {
         const response = await axios.get("http://localhost:8000/table");
+        console.log(response.data);
+        
         if (response.data.status === "success" && Array.isArray(response.data.data.tables)) {
+          console.log(response.data.data.tables);
+          
           setTables(response.data.data.tables);
         } else {
           setTables([]);
