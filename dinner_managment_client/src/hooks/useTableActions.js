@@ -12,6 +12,8 @@ const useTableActions = (setTables) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("error"); // 'success' | 'error' | 'warning' | 'info'
+  const [selectedTable, setSelectedTable] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const handleOpenDialog = () => setOpenDialog(true);
 
@@ -21,6 +23,62 @@ const useTableActions = (setTables) => {
     setTableNumber("");
   };
 
+  const handleTableClick = (table) => {
+    console.log("📌 שולחן נלחץ לעריכה:", table);
+    setSelectedTable(table);
+    setTableNumber(table.table_number);
+    setChairs(table.chairs);
+    setTableShape(table.shape);
+    setTableGender(table.gender);
+    setIsEditMode(false); // ❗ חשוב מאוד שיהיה false
+    setOpenDialog(true);
+  };  
+
+  const handleUpdateTable = async () => {
+    if (!selectedTable) return;
+  
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token not found");
+  
+      const updatedTable = {
+        table_number: Number(tableNumber),
+        chairs: Number(chairs),
+        shape: tableShape,
+        gender: tableGender,
+        people_list: selectedTable.people_list, // לשמור על הקיים
+        position: selectedTable.position,       // לשמור על הקיים
+      };
+      console.log("📦 updatedTable:", updatedTable);
+
+      const response = await axios.put(
+        `http://localhost:8000/table/${selectedTable.id}`,
+        updatedTable,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      if (response.data.status === "success") {
+        setTables((prev) =>
+          prev.map((t) =>
+            t.id === selectedTable.id ? { ...t, ...updatedTable } : t
+          )
+        );
+        setSnackbarMessage("השולחן עודכן בהצלחה");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        handleCloseDialog();
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      setSnackbarMessage("שגיאה בעדכון שולחן");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
+  
+
   const handleAddTable = async () => {
     if (!tableNumber) {
       setSnackbarMessage("יש להזין מספר שולחן.");
@@ -28,7 +86,7 @@ const useTableActions = (setTables) => {
       setSnackbarOpen(true);
       return;
     }
-  
+
     const newTable = {
       people_list: [],
       position: { x: 0, y: 0 },
@@ -37,11 +95,11 @@ const useTableActions = (setTables) => {
       shape: tableShape,
       gender: tableGender,
     };
-  
+
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token not found. Please login again.");
-  
+
       const response = await axios.post(
         "http://localhost:8000/table",
         newTable,
@@ -49,7 +107,7 @@ const useTableActions = (setTables) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       if (response.data.status === "success") {
         const insertedId = response.data.data?.inserted_id;
         if (insertedId) {
@@ -65,7 +123,8 @@ const useTableActions = (setTables) => {
         }
       } else {
         const serverMessage =
-          response.data?.data?.error_message || "שולחן לא נוסף - ייתכן שכבר קיים.";
+          response.data?.data?.error_message ||
+          "שולחן לא נוסף - ייתכן שכבר קיים.";
         setSnackbarMessage(serverMessage);
         setSnackbarSeverity("error");
         setSnackbarOpen(true);
@@ -77,7 +136,7 @@ const useTableActions = (setTables) => {
       setSnackbarOpen(true);
     }
   };
-  
+
   const confirmDeleteTable = (tableId) => {
     setTableToDelete(tableId);
     setDeleteDialogOpen(true);
@@ -132,6 +191,12 @@ const useTableActions = (setTables) => {
     setSnackbarMessage,
     snackbarSeverity,
     setSnackbarSeverity,
+    handleTableClick,
+    selectedTable,
+    setSelectedTable,
+    isEditMode,
+    setIsEditMode,
+    handleUpdateTable
   };
 };
 

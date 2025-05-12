@@ -4,7 +4,7 @@ import useTablesData from "../hooks/useTablesData";
 import useDragAndDrop from "../hooks/useDragAndDrop";
 import useTableActions from "../hooks/useTableActions";
 import DeleteDialog from "../components/dialogs/DeleteDialog";
-import AddTableDialog from "../components/dialogs/AddTableDialog";
+import AddAndEditTableDialog from "../components/dialogs/AddAndEditTableDialog";
 import TablesLayout from "../components/layouts/TablesLayout";
 import isAdmin from "../utils/auth";
 import { Snackbar, Alert as MuiAlert } from "@mui/material";
@@ -29,13 +29,18 @@ export default function TablesView() {
         confirmDeleteTable={admin ? tableActions.confirmDeleteTable : undefined}
         handleChairClick={tableActions.handleChairClick}
         admin={admin}
+        onTableClick={admin ? tableActions.handleTableClick : undefined}
       />
 
       {admin && (
-        <AddTableDialog
+        <AddAndEditTableDialog
           open={tableActions.openDialog}
           onClose={tableActions.handleCloseDialog}
-          onConfirm={tableActions.handleAddTable}
+          onConfirm={
+            tableActions.selectedTable
+              ? tableActions.handleUpdateTable
+              : tableActions.handleAddTable
+          }
           tableNumber={tableActions.tableNumber}
           setTableNumber={tableActions.setTableNumber}
           chairs={tableActions.chairs}
@@ -44,7 +49,11 @@ export default function TablesView() {
           setTableShape={tableActions.setTableShape}
           tableGender={tableActions.tableGender}
           setTableGender={tableActions.setTableGender}
+          isEditMode={tableActions.isEditMode}
+          selectedTable={tableActions.selectedTable}
+          setIsEditMode={tableActions.setIsEditMode}
         />
+
       )}
 
       {admin && (
