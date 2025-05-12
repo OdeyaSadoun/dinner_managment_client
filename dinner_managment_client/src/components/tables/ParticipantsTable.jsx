@@ -56,6 +56,7 @@ const ParticipantsTable = ({
           searchBy={[
             (participant) => participant.name,
             (participant) => participant.phone,
+            (participant) => participant.table_number?.toString()
           ]}
         />
 
