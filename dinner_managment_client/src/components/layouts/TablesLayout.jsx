@@ -36,11 +36,9 @@ const TablesLayout = ({
 
     const handleResetZoom = () => {
         setScale(MIN_SCALE);
-        // אחרי הרינדור של הסקייל נאפס גם את הגלילה בצורה חלקה
         setTimeout(scrollToTopLeftSmooth, 0);
     };
 
-    // גם כשמשתמשת בסליידר ומורידה ל־MIN_SCALE, נאפס גלילה!
     useEffect(() => {
         if (scale === MIN_SCALE) {
             setTimeout(scrollToTopLeftSmooth, 0);
@@ -171,26 +169,182 @@ const TablesLayout = ({
                                     />
                                 )}
 
-                                {Array.from({ length: table.chairs }).map((_, index) => {
-                                    const person = table.people_list[index];
-                                    const angle = (360 / table.chairs) * index;
-                                    const radius = 60;
-                                    const chairX = Math.cos((angle * Math.PI) / 180) * radius;
-                                    const chairY = Math.sin((angle * Math.PI) / 180) * radius;
+                                {(() => {
+                                    const shape = table.shape;
+                                    const chairs = [];
 
-                                    return (
-                                        <Chair
-                                            key={`${table.id}-chair-${index}`}
-                                            isOccupied={!!person}
-                                            sx={{
-                                                left: `${50 + chairX}%`,
-                                                top: `${50 + chairY}%`,
-                                                transform: "translate(-50%, -50%)",
-                                            }}
-                                            onClick={() => person && handleChairClick(person)}
-                                        />
-                                    );
-                                })}
+                                    if (shape === "circle") {
+                                        const radius = 60;
+                                        for (let i = 0; i < table.chairs; i++) {
+                                            const angle = (360 / table.chairs) * i;
+                                            const chairX = Math.cos((angle * Math.PI) / 180) * radius;
+                                            const chairY = Math.sin((angle * Math.PI) / 180) * radius;
+                                            const person = table.people_list[i];
+
+                                            chairs.push(
+                                                <Chair
+                                                    key={`${table.id}-chair-${i}`}
+                                                    isOccupied={!!person}
+                                                    sx={{
+                                                        left: `${50 + chairX}px`,
+                                                        top: `${50 + chairY}px`,
+                                                        transform: "translate(-50%, -50%)",
+                                                    }}
+                                                    onClick={() => person && handleChairClick(person)}
+                                                />
+                                            );
+                                        }
+                                    }
+
+                                    else if (shape === "rectangle") {
+                                        const width = 140;
+                                        const height = 80;
+                                        const padding = 10;
+
+                                        const shortSideChairs = 2; // בכל צד קצר
+                                        const remaining = table.chairs - shortSideChairs * 2;
+                                        const topChairs = Math.ceil(remaining / 2);
+                                        const bottomChairs = Math.floor(remaining / 2);
+
+                                        let index = 0;
+
+                                        // LEFT
+                                        for (let i = 0; i < shortSideChairs; i++, index++) {
+                                            const person = table.people_list[index];
+                                            chairs.push(
+                                                <Chair
+                                                    key={`${table.id}-chair-left-${i}`}
+                                                    isOccupied={!!person}
+                                                    sx={{
+                                                        top: ((i + 1) * height) / (shortSideChairs + 1),
+                                                        left: -padding,
+                                                        position: "absolute",
+                                                        transform: "translate(-50%, -50%)",
+                                                    }}
+                                                    onClick={() => person && handleChairClick(person)}
+                                                />
+                                            );
+                                        }
+
+                                        // RIGHT
+                                        for (let i = 0; i < shortSideChairs; i++, index++) {
+                                            const person = table.people_list[index];
+                                            chairs.push(
+                                                <Chair
+                                                    key={`${table.id}-chair-right-${i}`}
+                                                    isOccupied={!!person}
+                                                    sx={{
+                                                        top: ((i + 1) * height) / (shortSideChairs + 1),
+                                                        left: width + padding,
+                                                        position: "absolute",
+                                                        transform: "translate(-50%, -50%)",
+                                                    }}
+                                                    onClick={() => person && handleChairClick(person)}
+                                                />
+                                            );
+                                        }
+
+                                        // TOP
+                                        for (let i = 0; i < topChairs; i++, index++) {
+                                            const person = table.people_list[index];
+                                            chairs.push(
+                                                <Chair
+                                                    key={`${table.id}-chair-top-${i}`}
+                                                    isOccupied={!!person}
+                                                    sx={{
+                                                        top: -padding,
+                                                        left: ((i + 1) * width) / (topChairs + 1),
+                                                        position: "absolute",
+                                                        transform: "translate(-50%, -50%)",
+                                                    }}
+                                                    onClick={() => person && handleChairClick(person)}
+                                                />
+                                            );
+                                        }
+
+                                        // BOTTOM
+                                        for (let i = 0; i < bottomChairs; i++, index++) {
+                                            const person = table.people_list[index];
+                                            chairs.push(
+                                                <Chair
+                                                    key={`${table.id}-chair-bottom-${i}`}
+                                                    isOccupied={!!person}
+                                                    sx={{
+                                                        top: height + padding,
+                                                        left: ((i + 1) * width) / (bottomChairs + 1),
+                                                        position: "absolute",
+                                                        transform: "translate(-50%, -50%)",
+                                                    }}
+                                                    onClick={() => person && handleChairClick(person)}
+                                                />
+                                            );
+                                        }
+
+                                        return chairs;
+                                    }
+
+
+                                    else if (shape === "square") {
+                                        const width = 100;
+                                        const height = 100;
+                                        const sides = 4;
+                                        const perSide = Math.ceil(table.chairs / sides);
+                                        const padding = 10;
+
+                                        for (let i = 0; i < table.chairs; i++) {
+                                            const person = table.people_list[i];
+                                            const side = Math.floor(i / perSide);
+                                            const indexOnSide = i % perSide;
+
+                                            let chairStyle = {};
+                                            const spacing = (side % 2 === 0 ? width : height) / (perSide + 1);
+
+                                            switch (side) {
+                                                case 0:
+                                                    chairStyle = {
+                                                        top: -padding,
+                                                        left: spacing * (indexOnSide + 1),
+                                                    };
+                                                    break;
+                                                case 1:
+                                                    chairStyle = {
+                                                        top: spacing * (indexOnSide + 1),
+                                                        left: width + padding,
+                                                    };
+                                                    break;
+                                                case 2:
+                                                    chairStyle = {
+                                                        top: height + padding,
+                                                        left: spacing * (indexOnSide + 1),
+                                                    };
+                                                    break;
+                                                case 3:
+                                                    chairStyle = {
+                                                        top: spacing * (indexOnSide + 1),
+                                                        left: -padding,
+                                                    };
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+
+                                            chairs.push(
+                                                <Chair
+                                                    key={`${table.id}-chair-${i}`}
+                                                    isOccupied={!!person}
+                                                    sx={{
+                                                        ...chairStyle,
+                                                        position: "absolute",
+                                                        transform: "translate(-50%, -50%)",
+                                                    }}
+                                                    onClick={() => person && handleChairClick(person)}
+                                                />
+                                            );
+                                        }
+                                    }
+
+                                    return chairs;
+                                })()}
                             </Table>
                         ))
                     ) : (
