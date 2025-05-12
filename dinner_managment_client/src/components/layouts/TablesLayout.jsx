@@ -4,6 +4,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RotateRightIcon from '@mui/icons-material/RotateRight';
 import Chair from "../../style/Chair";
 import Table from "../../style/Table";
+import axios from "axios";
+
 
 const TablesLayout = ({
     tables,
@@ -28,6 +30,43 @@ const TablesLayout = ({
     const handleScaleChange = (event, newValue) => {
         setScale(newValue);
     };
+
+    const handleRotateTable = async (table) => {
+        const newRotation = ((table.rotation || 0) + 15) % 360;
+
+        const updatedTable = {
+            table_number: table.table_number,
+            chairs: table.chairs,
+            shape: table.shape,
+            gender: table.gender,
+            position: table.position,
+            people_list: table.people_list,
+            is_active: table.is_active,
+            rotation: newRotation,
+        };
+
+        setTables((prev) =>
+            prev.map((t) =>
+                t.id === table.id ? { ...t, rotation: newRotation } : t
+            )
+        );
+
+        try {
+            const token = localStorage.getItem("token"); // או מאיפה שאת שומרת אותו
+
+            // שליחה לשרת
+            const response = await axios.put(`http://localhost:8000/table/${table.id}`, updatedTable, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+            console.log(response.data);
+
+        } catch (error) {
+            console.error("❌ שגיאה בעדכון rotation לשרת:", error);
+        }
+    };
+
 
     const scrollToTopLeftSmooth = () => {
         if (scrollContainerRef.current) {
@@ -139,11 +178,15 @@ const TablesLayout = ({
                         transform: `scale(${scale})`,
                         transformOrigin: "top left",
                         transition: "transform 0.3s ease",
-                        width: `${1000 / scale}px`,
-                        height: `${800 / scale}px`,
+                        width: `${1000 + 2 * 100}px`, // מוסיפים את הפדינג לרוחב האזור
+                        height: `${800 + 2 * 100}px`,
+                        padding: "100px",
+                        boxSizing: "border-box", // חיוני שהפדינג ייכנס לתוך ה-width
                         position: "relative",
+                        backgroundColor: "#eee", // זמני לבדיקה
                     }}
                 >
+
                     {tables.length > 0 ? (
                         tables.map((table) => (
                             <Box
@@ -170,8 +213,7 @@ const TablesLayout = ({
                                         }
                                     }}
                                 >
-                                    {console.log(table)}
-                                    <Typography align="center" sx={{ fontSize: 35 }}>
+                                    <Typography align="center" sx={{ fontSize: 30 }}>
                                         {table.table_number}
                                     </Typography>
                                     {admin && (
@@ -198,13 +240,7 @@ const TablesLayout = ({
                                     <RotateRightIcon
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setTables((prev) =>
-                                                prev.map((t) =>
-                                                    t.id === table.id
-                                                        ? { ...t, rotation: ((t.rotation || 0) + 15) % 360 }
-                                                        : t
-                                                )
-                                            );
+                                            handleRotateTable(table);
                                         }}
                                         sx={{
                                             position: "absolute",
