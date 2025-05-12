@@ -92,8 +92,8 @@ const TablesLayout = ({
                         transform: `scale(${scale})`,
                         transformOrigin: "top left",
                         transition: "transform 0.3s ease",
-                        width: "1000px", // גודל האולם
-                        height: "800px",
+                        width: `${1000 / scale}px`, // 🟢 חישוב דינמי של רוחב פיזי
+                        height: `${800 / scale}px`, // 🟢 חישוב דינמי של גובה פיזי
                         position: "relative",
                     }}
                 >
