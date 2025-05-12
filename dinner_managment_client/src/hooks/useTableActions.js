@@ -31,7 +31,7 @@ const useTableActions = (setTables) => {
   
     const newTable = {
       people_list: [],
-      position: { x: 50, y: 50 },
+      position: { x: 0, y: 0 },
       chairs,
       table_number: tableNumber,
       shape: tableShape,

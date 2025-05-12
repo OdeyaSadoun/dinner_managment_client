@@ -20,31 +20,28 @@ const useDragAndDrop = (tables, setTables) => {
 
   const handleDrop = async (event) => {
     event.preventDefault();
-
+  
     const data = JSON.parse(event.dataTransfer.getData("text/plain"));
     const { tableId, offsetX, offsetY, scale } = data;
-
-    const { clientX, clientY } = event;
+  
     const container = event.currentTarget.getBoundingClientRect();
-
-    // חישוב מיקום חדש לפי קנה מידה ומיקום בתוך המיכל
-    const newPosition = {
-      x: clientX - container.left - offsetX * scale,
-      y: clientY - container.top - offsetY * scale,
-    };
-
-    // עדכון בסטייט
+  
+    // מיקום מדויק לפי הקליק ושימוש ב-scale
+    const x = (event.clientX - container.left - offsetX * scale) / scale;
+    const y = (event.clientY - container.top - offsetY * scale) / scale;
+  
+    const newPosition = { x, y };
+  
     setTables((prev) =>
       prev.map((t) =>
         t.id === tableId ? { ...t, position: newPosition } : t
       )
     );
-
-    // שמירה במסד הנתונים
+  
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token not found. Please login again.");
-
+  
       await axios.patch(
         `http://localhost:8000/table/position/${tableId}`,
         { position: newPosition },
@@ -56,7 +53,7 @@ const useDragAndDrop = (tables, setTables) => {
       console.error("Error updating table position:", error);
     }
   };
-
+  
   const handleDragOver = (event) => {
     event.preventDefault();
   };
