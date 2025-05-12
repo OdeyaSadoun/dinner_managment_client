@@ -14,7 +14,7 @@ const Table = styled(Box)(({ shape, gender }) => {
   }
 
   if (shape === "bima") {
-    width = baseWidth * 4;
+    width = baseWidth * 6;
     height = baseHeight / 2;
     backgroundColor = "gold";
   }

@@ -171,10 +171,9 @@ const TablesLayout = ({
                                     }}
                                 >
                                     {console.log(table)}
-                                    <Typography variant="subtitle2" align="center">
+                                    <Typography align="center" sx={{ fontSize: 35 }}>
                                         {table.table_number}
                                     </Typography>
-
                                     {admin && (
                                         <DeleteIcon
                                             onClick={() => confirmDeleteTable(table.id)}
@@ -228,7 +227,7 @@ const TablesLayout = ({
                                         const shape = table.shape;
                                         const chairs = [];
                                         if (shape === "bima") {
-                                            const width = 140 * 4;
+                                            const width = 140 * 6;
                                             const height = 80 / 2;
                                             const padding = 10;
                                             const people = Array.isArray(table.people_list) ? table.people_list : [];
