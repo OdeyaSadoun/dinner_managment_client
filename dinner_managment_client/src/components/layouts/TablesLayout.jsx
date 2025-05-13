@@ -109,7 +109,6 @@ const TablesLayout = ({
                                 העלאת CSV שולחנות
                             </Button>
                         </label>
-
                     </div>
                 )}
 
@@ -209,9 +208,9 @@ const TablesLayout = ({
                                     onMouseMove={() => { isClickRef.current = false; }}
                                     onDoubleClick={() => {
                                         if (onTableClick) {
-                                          onTableClick(table);
+                                            onTableClick(table);
                                         }
-                                      }}                                      
+                                    }}
                                 >
                                     <Typography align="center" sx={{ fontSize: 30 }}>
                                         {table.table_number}
