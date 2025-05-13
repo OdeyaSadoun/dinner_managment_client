@@ -172,6 +172,7 @@ const useParticipantActions = (
       contact_person: participant.contact_person || null,
       add_manual: participant.add_manual ?? true,
       id: participant.id || participant._id,
+      original_is_reach_the_dinner: participant.is_reach_the_dinner, // 👈 שורה חדשה
     });
     setOpen(true);
   };
@@ -189,6 +190,7 @@ const useParticipantActions = (
         gender: newParticipant.gender,
         contact_person: newParticipant.contact_person || null,
         add_manual: newParticipant.add_manual ?? false,
+        original_is_reach_the_dinner: newParticipant.original_is_reach_the_dinner ?? null,
       };
       console.log(sanitizedParticipant);
       console.log("🟢 newParticipant:", newParticipant);
@@ -231,7 +233,7 @@ const useParticipantActions = (
         (p) => p.id === participantToDelete || p._id === participantToDelete
       );
       const tableNumber = participant?.table_number;
-      const reachToDinner = participant?.is_reach_the_dinner
+      const reachToDinner = participant?.is_reach_the_dinner;
 
       await axios.patch(
         `http://localhost:8000/person/delete/${participantToDelete}`,
