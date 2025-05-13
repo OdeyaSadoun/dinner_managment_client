@@ -5,6 +5,7 @@ import { useSnackbar } from "notistack";
 
 const useParticipantActions = (
   setParticipants,
+  participants,
   tableMapping,
   setSnackbarOpen,
   setSnackbarMessage,
@@ -140,7 +141,7 @@ const useParticipantActions = (
         }
       );
       console.log(response.data);
-      
+
       if (response.data.status === "success") {
         console.log(response.data.data);
 
@@ -224,9 +225,17 @@ const useParticipantActions = (
 
     try {
       const token = localStorage.getItem("token");
+
+      // שליפת המשתתף מה־state הנוכחי
+      const participant = participants.find(
+        (p) => p.id === participantToDelete || p._id === participantToDelete
+      );
+      const tableNumber = participant?.table_number;
+      const reachToDinner = participant?.is_reach_the_dinner
+
       await axios.patch(
         `http://localhost:8000/person/delete/${participantToDelete}`,
-        {},
+        { table_number: tableNumber, is_reach_the_dinner: reachToDinner }, // 👈 שולחים את מספר השולחן
         {
           headers: { Authorization: `Bearer ${token}` },
         }

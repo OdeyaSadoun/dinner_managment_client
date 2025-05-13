@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container } from "@mui/material";
 import useTablesData from "../hooks/useTablesData";
 import useDragAndDrop from "../hooks/useDragAndDrop";
@@ -9,20 +9,26 @@ import TablesLayout from "../components/layouts/TablesLayout";
 import isAdmin from "../utils/auth";
 import { Snackbar, Alert as MuiAlert } from "@mui/material";
 import useUploadTablesCsv from "../hooks/useUploadTablesCSV";
+import { LinearProgress } from "@mui/material";
+import useParticipantsData from "../hooks/useParticipantsData";
 
 
 export default function TablesView() {
   const { tables, setTables } = useTablesData();
   const { handleDragStart, handleDrop, handleDragOver } = useDragAndDrop(tables, setTables);
   const tableActions = useTableActions(setTables);
+  const {fetchTables} = useParticipantsData();
   const admin = isAdmin();
   console.log(admin);
-  const { handleUploadTablesCsv } = useUploadTablesCsv(setTables);
+  const { handleUploadTablesCsv, csvLoading } = useUploadTablesCsv(setTables, fetchTables);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 8, mb: 4, minHeight: "calc(100vh - 200px)" }}>
+      {csvLoading && <LinearProgress sx={{ mb: 2 }} />}
+
       <TablesLayout
         tables={tables}
+        csvLoading={csvLoading}
         setTables={setTables}
         handleOpenDialog={admin ? tableActions.handleOpenDialog : undefined}
         handleDragStart={admin ? handleDragStart : undefined}

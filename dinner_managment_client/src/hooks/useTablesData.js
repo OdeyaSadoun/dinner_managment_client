@@ -25,7 +25,7 @@ const useTablesData = () => {
 
     fetchTables();
   }, []);
-
+  
   return { tables, setTables };
 };
 

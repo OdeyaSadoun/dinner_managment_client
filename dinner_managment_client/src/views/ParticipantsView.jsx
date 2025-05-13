@@ -41,6 +41,7 @@ const ParticipantsView = () => {
     ...actions // שאר הפונקציות והסטייטים
   } = useParticipantActions(
     setParticipants,
+    participants,
     tableMapping,
     setSnackbarOpen,
     setSnackbarMessage,

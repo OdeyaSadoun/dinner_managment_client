@@ -19,7 +19,7 @@ const useParticipantsData = () => {
         tableRes.data.status === "success" &&
         Array.isArray(tableRes.data.data.tables)
       ) {
-        const fetchedTables = tableRes.data.data.tables;
+        const fetchedTables = tableRes.data.data.tables; // 💥 הוספת השורה הזו
         setTables(fetchedTables);
 
         const mapping = fetchedTables.reduce((acc, table) => {
@@ -60,6 +60,7 @@ const useParticipantsData = () => {
     loading,
     error,
     fetchParticipants: fetchData, // ✅ מחזירים את הפונקציה
+    fetchTables: fetchData,
   };
 };
 
