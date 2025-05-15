@@ -15,7 +15,7 @@ import { LinearProgress } from "@mui/material";
 export default function TablesView() {
   const { tables, setTables, fetchTables } = useTablesData();
   const { handleDragStart, handleDrop, handleDragOver } = useDragAndDrop(tables, setTables);
-  const tableActions = useTableActions(setTables);
+  const tableActions = useTableActions(setTables, fetchTables);
   const admin = isAdmin();
   console.log(admin);
   const { handleUploadTablesCsv, csvLoading } = useUploadTablesCsv(setTables, fetchTables);

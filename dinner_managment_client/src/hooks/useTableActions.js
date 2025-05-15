@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 
-const useTableActions = (setTables) => {
+const useTableActions = (setTables, fetchTables) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [tableToDelete, setTableToDelete] = useState(null);
@@ -41,10 +41,22 @@ const useTableActions = (setTables) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token not found");
 
-      // שליחת הטבלה הנוכחית בדיוק כפי שהיא (בהנחה שהיא כוללת people_list תקף)
+      // שליחת הטבלה עם הערכים המעודכנים מה־state
+      const updatedTable = {
+        id: selectedTable.id,
+        table_number: tableNumber,
+        chairs: chairs,
+        shape: tableShape,
+        gender: tableGender,
+        position: selectedTable.position || { x: 0, y: 0 },
+        rotation: selectedTable.rotation || 0,
+        people_list: selectedTable.people_list || [],
+        is_active: selectedTable.is_active ?? true,
+      };
+
       const response = await axios.put(
         `http://localhost:8000/table/${selectedTable.id}`,
-        selectedTable,
+        updatedTable,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -53,13 +65,7 @@ const useTableActions = (setTables) => {
       console.log("📦 תוצאה מהשרת:", response.data);
 
       if (response.data.status === "success") {
-        setTables((prev) =>
-          prev.map((t) =>
-            t.id === selectedTable.id
-              ? { ...t, ...(response.data.data.updated_table || selectedTable) }
-              : t
-          )
-        );
+        await fetchTables(); // ✅ מרענן את הנתונים ישירות מהשרת
         setSnackbarMessage("השולחן עודכן בהצלחה");
         setSnackbarSeverity("success");
         setSnackbarOpen(true);
