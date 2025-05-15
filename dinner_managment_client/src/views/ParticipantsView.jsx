@@ -51,7 +51,13 @@ const ParticipantsView = () => {
     setFilteredParticipants,
     fetchParticipants
   );
-  const handlePrintLabel = usePrintLabel(tableMapping, fetchParticipants);
+  const handlePrintLabel = usePrintLabel(
+    tableMapping,
+    fetchParticipants,
+    setSnackbarOpen,
+    setSnackbarMessage,
+    setSnackbarSeverity
+  );
 
   return (
     <Container maxWidth="lg" sx={{ mt: 8, minHeight: '80vh' }}>
@@ -117,6 +123,7 @@ const ParticipantsView = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
     </Container>
   );
 };

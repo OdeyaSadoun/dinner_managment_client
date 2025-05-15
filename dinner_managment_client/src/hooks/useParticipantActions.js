@@ -97,14 +97,20 @@ const useParticipantActions = (
       );
 
       if (response.data.status === "success") {
-        alert("✅ ייבוא הצליח!");
+        setSnackbarMessage("ייבוא המשתפים הצליח");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
         await fetchParticipants();
       } else {
-        alert("⚠️ ייבוא נכשל: " + (response.data.data?.error || ""));
+        setSnackbarMessage("ייבוא נכשל: " + (response.data.data?.error || ""));
+        setSnackbarSeverity("warning");
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error("שגיאה בייבוא:", error);
-      alert("❌ שגיאה בעת הייבוא");
+      setSnackbarMessage("שגיאה בעת ייבוא המשתתפים");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     } finally {
       setCsvLoading(false); // ✅ סיום ייבוא
     }
@@ -140,11 +146,11 @@ const useParticipantActions = (
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log(response.data);
 
       if (response.data.status === "success") {
-        console.log(response.data.data);
-
+        setSnackbarMessage("המשתתף נוסף בהצלחה");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
         await fetchParticipants();
         setNewParticipant({
           name: "",
@@ -157,11 +163,15 @@ const useParticipantActions = (
         });
         handleCloseDialog();
       } else {
-        alert("Failed to add participant.");
+        setSnackbarMessage("הוספת המשתתף נכשלה");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error("Error adding participant:", error);
-      alert("An error occurred while adding the participant.");
+      setSnackbarMessage("שגיאה כללית בהוספת המשתתף");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -180,8 +190,6 @@ const useParticipantActions = (
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem("token");
-
-      // מסנכרן את הפורמט לשרת לפי המודל
       const sanitizedParticipant = {
         name: newParticipant.name,
         phone: newParticipant.phone || null,
@@ -190,30 +198,27 @@ const useParticipantActions = (
         gender: newParticipant.gender,
         contact_person: newParticipant.contact_person || null,
         add_manual: newParticipant.add_manual ?? false,
-        original_is_reach_the_dinner: newParticipant.original_is_reach_the_dinner ?? null,
+        original_is_reach_the_dinner:
+          newParticipant.original_is_reach_the_dinner ?? null,
       };
-      console.log(sanitizedParticipant);
-      console.log("🟢 newParticipant:", newParticipant);
-      console.log("🧼 sanitizedParticipant:", sanitizedParticipant);
-      console.log(
-        "📡 URL שנשלחת:",
-        `http://localhost:8000/person/${newParticipant.id}`
-      );
-
       const response = await axios.put(
         `http://localhost:8000/person/${newParticipant.id}`,
         sanitizedParticipant,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log(response.data);
 
       if (response.data.status === "success") {
+        setSnackbarMessage("המשתתף עודכן בהצלחה");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
         await fetchParticipants();
         handleCloseDialog();
       }
     } catch (error) {
       console.error("Error updating participant:", error);
-      alert("Failed to update participant. Please try again.");
+      setSnackbarMessage("עדכון המשתתף נכשל");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -227,8 +232,6 @@ const useParticipantActions = (
 
     try {
       const token = localStorage.getItem("token");
-
-      // שליפת המשתתף מה־state הנוכחי
       const participant = participants.find(
         (p) => p.id === participantToDelete || p._id === participantToDelete
       );
@@ -242,7 +245,9 @@ const useParticipantActions = (
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+      setSnackbarMessage("המשתתף נמחק בהצלחה");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
       setParticipants((prev) => {
         const updated = prev.filter((p) => p.id !== participantToDelete);
         if (hasSearched) {
@@ -257,7 +262,9 @@ const useParticipantActions = (
       });
     } catch (error) {
       console.error("Error deleting participant:", error);
-      alert("Failed to delete participant. Please try again.");
+      setSnackbarMessage("שגיאה כללית במחיקת המשתתף");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     } finally {
       setDeleteDialogOpen(false);
       setParticipantToDelete(null);
@@ -307,14 +314,17 @@ const useParticipantActions = (
           participant.table_number
         );
       }
-
+      setSnackbarMessage("הושבת המשתתף בשולחן בוצעה בהצלחה");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
       setParticipants((prev) =>
         prev.map((p) => (p.id === participant.id ? updatedParticipant : p))
       );
     } catch (error) {
       console.error("Error updating participant or table:", error);
-      alert("Failed to update participant. Please try again.");
-    }
+      setSnackbarMessage("שגיאה כללית בהושבת המשתתף");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);    }
   };
 
   return {
