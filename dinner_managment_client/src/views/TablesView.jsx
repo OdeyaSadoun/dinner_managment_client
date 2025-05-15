@@ -10,14 +10,12 @@ import isAdmin from "../utils/auth";
 import { Snackbar, Alert as MuiAlert } from "@mui/material";
 import useUploadTablesCsv from "../hooks/useUploadTablesCSV";
 import { LinearProgress } from "@mui/material";
-import useParticipantsData from "../hooks/useParticipantsData";
 
 
 export default function TablesView() {
-  const { tables, setTables } = useTablesData();
+  const { tables, setTables, fetchTables } = useTablesData();
   const { handleDragStart, handleDrop, handleDragOver } = useDragAndDrop(tables, setTables);
   const tableActions = useTableActions(setTables);
-  const {fetchTables} = useParticipantsData();
   const admin = isAdmin();
   console.log(admin);
   const { handleUploadTablesCsv, csvLoading } = useUploadTablesCsv(setTables, fetchTables);

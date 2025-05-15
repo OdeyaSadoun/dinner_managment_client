@@ -14,20 +14,20 @@ const useParticipantsData = () => {
       setLoading(true);
 
       // קריאה לטבלאות
-      const tableRes = await axios.get("http://localhost:8000/table");
-      if (
-        tableRes.data.status === "success" &&
-        Array.isArray(tableRes.data.data.tables)
-      ) {
-        const fetchedTables = tableRes.data.data.tables; // 💥 הוספת השורה הזו
-        setTables(fetchedTables);
+      // const tableRes = await axios.get("http://localhost:8000/table");
+      // if (
+      //   tableRes.data.status === "success" &&
+      //   Array.isArray(tableRes.data.data.tables)
+      // ) {
+      //   const fetchedTables = tableRes.data.data.tables; // 💥 הוספת השורה הזו
+      //   setTables(fetchedTables);
 
-        const mapping = fetchedTables.reduce((acc, table) => {
-          acc[table.table_number] = table.id;
-          return acc;
-        }, {});
-        setTableMapping(mapping);
-      }
+      //   const mapping = fetchedTables.reduce((acc, table) => {
+      //     acc[table.table_number] = table.id;
+      //     return acc;
+      //   }, {});
+      //   setTableMapping(mapping);
+      // }
 
       // קריאה לאנשים
       const peopleRes = await axios.get("http://localhost:8000/person");
@@ -55,12 +55,12 @@ const useParticipantsData = () => {
   return {
     participants,
     setParticipants,
-    tables,
-    tableMapping,
+    // tables,
+    // tableMapping,
     loading,
     error,
     fetchParticipants: fetchData, // ✅ מחזירים את הפונקציה
-    fetchTables: fetchData,
+    // fetchTables: fetchData,
   };
 };
 
