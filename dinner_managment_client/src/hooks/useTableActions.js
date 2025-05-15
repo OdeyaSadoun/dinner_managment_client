@@ -41,49 +41,55 @@ const useTableActions = (setTables) => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token not found");
 
-      const updatedTable = {
-        table_number: tableNumber,
-        chairs: chairs,
-        shape: tableShape,
-        gender: tableGender,
-        position: selectedTable?.position || { x: 0, y: 0 },
-        rotation: selectedTable?.rotation || 0,
-        is_active: selectedTable?.is_active ?? true,
-        people_list: (selectedTable?.people_list || []).map((p) => ({
-          id: p.id,
-          name: p.name,
-          gender: p.gender,
-          table_number: p.table_number,
-          is_reach_the_dinner: p.is_reach_the_dinner,
-          is_active: p.is_active,
-        })),
-      };
-
-      console.log("📦 updatedTable:", updatedTable);
-
+      // שליחת הטבלה הנוכחית בדיוק כפי שהיא (בהנחה שהיא כוללת people_list תקף)
       const response = await axios.put(
         `http://localhost:8000/table/${selectedTable.id}`,
-        updatedTable,
+        selectedTable,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log(response.data);
+
+      console.log("📦 תוצאה מהשרת:", response.data);
 
       if (response.data.status === "success") {
         setTables((prev) =>
           prev.map((t) =>
-            t.id === selectedTable.id ? { ...t, ...updatedTable } : t
+            t.id === selectedTable.id
+              ? { ...t, ...(response.data.data.updated_table || selectedTable) }
+              : t
           )
         );
         setSnackbarMessage("השולחן עודכן בהצלחה");
         setSnackbarSeverity("success");
         setSnackbarOpen(true);
         handleCloseDialog();
+      } else {
+        const messageFromServer = response.data?.data?.error_message;
+        if (messageFromServer === "לא ניתן לערוך שולחן עם אנשים משובצים.") {
+          setSnackbarMessage(messageFromServer);
+        } else {
+          setSnackbarMessage("אירעה שגיאה בעדכון השולחן.");
+        }
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error("Update error:", error);
-      setSnackbarMessage("שגיאה בעדכון שולחן");
+
+      const fallbackMessage = "שגיאה כללית בעדכון השולחן";
+
+      const messageFromServer =
+        error.response?.data?.data?.error_message ||
+        error.response?.data?.data ||
+        fallbackMessage;
+
+      if (messageFromServer === "לא ניתן לערוך שולחן עם אנשים משובצים.") {
+        setSnackbarMessage(messageFromServer);
+      } else {
+        setSnackbarMessage(fallbackMessage);
+      }
+
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
     }
@@ -154,11 +160,11 @@ const useTableActions = (setTables) => {
 
   const handleDeleteTable = async () => {
     if (!tableToDelete) return;
-  
+
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
-  
+
       const response = await axios.patch(
         `http://localhost:8000/table/delete/${tableToDelete}`,
         {},
@@ -167,11 +173,9 @@ const useTableActions = (setTables) => {
         }
       );
       console.log(response.data);
-  
+
       if (response.data.status === "success") {
-        setTables((prev) =>
-          prev.filter((table) => table.id !== tableToDelete)
-        );
+        setTables((prev) => prev.filter((table) => table.id !== tableToDelete));
         setSnackbarMessage("השולחן נמחק בהצלחה.");
         setSnackbarSeverity("success");
         setSnackbarOpen(true);
@@ -200,7 +204,7 @@ const useTableActions = (setTables) => {
       setTableToDelete(null);
     }
   };
-  
+
   return {
     openDialog,
     setOpenDialog, // מחזירים כדי שיהיה אפשר לשנות מחוץ ל-hook
