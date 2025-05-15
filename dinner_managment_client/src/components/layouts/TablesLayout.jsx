@@ -248,7 +248,7 @@ const TablesLayout = ({
                                         />
                                     )}
 
-                                    <RotateRightIcon
+                                    {admin && (<RotateRightIcon
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleRotateTable(table);
@@ -269,6 +269,7 @@ const TablesLayout = ({
                                             },
                                         }}
                                     />
+                                    )},
 
                                     {(() => {
                                         const shape = table.shape;
