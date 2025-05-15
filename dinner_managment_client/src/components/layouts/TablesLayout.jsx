@@ -1,10 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Typography, Button, Slider, Stack, Tooltip } from "@mui/material";
+import { Box, Typography, Button, Slider, Stack, Tooltip, IconButton } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RotateRightIcon from '@mui/icons-material/RotateRight';
 import Chair from "../../style/Chair";
 import Table from "../../style/Table";
 import axios from "axios";
+import AddIcon from '@mui/icons-material/Add';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap'; // איקון לאיפוס זום
+
 
 
 const TablesLayout = ({
@@ -94,9 +98,12 @@ const TablesLayout = ({
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                 {admin && (
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
-                        <Button variant="contained" color="primary" onClick={handleOpenDialog}>
-                            הוסף שולחן
-                        </Button>
+                        <Tooltip title="הוסף שולחן חדש">
+                            <IconButton onClick={handleOpenDialog} sx={{ color: 'green.main' }}>
+                                <AddIcon />
+                            </IconButton>
+                        </Tooltip>
+
                         <label htmlFor="upload-tables-csv">
                             <input
                                 id="upload-tables-csv"
@@ -105,9 +112,12 @@ const TablesLayout = ({
                                 style={{ display: "none" }}
                                 onChange={handleUploadTablesCsv}
                             />
-                            <Button variant="outlined" component="span">
-                                העלאת CSV שולחנות
-                            </Button>
+                            <Tooltip title="ייבוא CSV">
+                                <IconButton component="span">
+                                    <UploadFileIcon />
+                                </IconButton>
+                            </Tooltip>
+
                         </label>
                     </div>
                 )}
@@ -150,10 +160,12 @@ const TablesLayout = ({
                             </Button>
                         </span>
                     </Tooltip>
+                    <Tooltip title="איפוס קנה מידה">
+                        <IconButton onClick={handleResetZoom} color="primary">
+                            <ZoomOutMapIcon />
+                        </IconButton>
+                    </Tooltip>
 
-                    <Button variant="outlined" size="small" onClick={handleResetZoom}>
-                        איפוס זום
-                    </Button>
                 </Stack>
             </Box>
 

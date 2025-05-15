@@ -7,6 +7,8 @@ import UploadIcon from "@mui/icons-material/Upload";
 import AddIcon from "@mui/icons-material/Add";
 import DownloadIcon from "@mui/icons-material/Download";
 import LinearProgress from "@mui/material/LinearProgress";
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import Tooltip from "@mui/material/Tooltip"; // תוודאי שזה מאופשר למעלה
 
 const ParticipantsTable = ({
   participants,
@@ -62,39 +64,46 @@ const ParticipantsTable = ({
 
         {allowAdd && (
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Button
-              variant="text"
-              color="info"
-              onClick={handleDownloadAllParticipants}
-              sx={{ minWidth: 0, p: 1 }}
-            >
-              <DownloadIcon />
-            </Button>
+            <Tooltip title="הורדת כל המשתתפים">
+              <Button
+                variant="text"
+                color="gray"
+                onClick={handleDownloadAllParticipants}
+                sx={{ minWidth: 0, p: 1 }}
+              >
+                <DownloadIcon />
+              </Button>
+            </Tooltip>
 
-            <Button
-              variant="text"
-              color="success"
-              onClick={handleOpenDialog}
-              sx={{ minWidth: 0, p: 1 }}
-            >
-              <AddIcon />
-            </Button>
+            <Tooltip title="הוסף משתתף חדש">
+              <Button
+                variant="text"
+                color="gray"
+                onClick={handleOpenDialog}
+                sx={{ minWidth: 0, p: 1 }}
+              >
+                <AddIcon />
+              </Button>
+            </Tooltip>
 
-            <Button
-              variant="text"
-              component="label"
-              color="secondary"
-              sx={{ minWidth: 0, p: 1 }}
-            >
-              <UploadIcon />
-              <input
-                type="file"
-                accept=".csv"
-                hidden
-                onChange={(e) => handleCSVUpload(e)}
-              />
-            </Button>
+            <Tooltip title="ייבוא CSV">
+              <Button
+                variant="text"
+                component="label"
+                color="gray"
+                sx={{ minWidth: 0, p: 1 }}
+              >
+                <UploadFileIcon />
+                <input
+                  type="file"
+                  accept=".csv"
+                  hidden
+                  onChange={(e) => handleCSVUpload(e)}
+                />
+              </Button>
+            </Tooltip>
           </Box>
+
         )}
       </Box>
 
