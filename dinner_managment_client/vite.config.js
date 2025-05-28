@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 
-// https://vite.dev/config/
+// שימי base: '/REPO_NAME/'
 export default defineConfig({
-  plugins: [react()],
+  base: '/OdeyaSadoun/',
+  plugins: [react()]
 })
