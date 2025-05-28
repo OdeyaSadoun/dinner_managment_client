@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
 
 // שימי base: '/REPO_NAME/'
 export default defineConfig({
-  base: '/OdeyaSadoun/',
-  plugins: [react()]
-})
+  base: "/dinner_managment_client/",
+  plugins: [react()],
+});
