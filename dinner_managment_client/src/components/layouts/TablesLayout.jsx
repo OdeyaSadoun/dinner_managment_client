@@ -10,7 +10,6 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap'; // איקון לאיפוס זום
 
 
-
 const TablesLayout = ({
     tables,
     handleOpenDialog,
@@ -70,7 +69,6 @@ const TablesLayout = ({
             console.error("❌ שגיאה בעדכון rotation לשרת:", error);
         }
     };
-
 
     const scrollToTopLeftSmooth = () => {
         if (scrollContainerRef.current) {

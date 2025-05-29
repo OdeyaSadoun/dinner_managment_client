@@ -3,6 +3,5 @@ import react from "@vitejs/plugin-react-swc";
 
 // שימי base: '/REPO_NAME/'
 export default defineConfig({
-  base: "/dinner_managment_client/",
   plugins: [react()],
 });
