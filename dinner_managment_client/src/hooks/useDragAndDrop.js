@@ -1,4 +1,5 @@
 import axios from "axios";
+import { HOST } from "../config";
 
 const useDragAndDrop = (tables, setTables) => {
   const handleDragStart = (event, tableId, scale = 1) => {
@@ -43,7 +44,7 @@ const useDragAndDrop = (tables, setTables) => {
       if (!token) throw new Error("Token not found. Please login again.");
   
       await axios.patch(
-        `http://localhost:8000/table/position/${tableId}`,
+        `http://${HOST}:8000/table/position/${tableId}`,
         { position: newPosition },
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { HOST } from '../config';
 
 const usePrintLabel = (
   tableMapping,
@@ -21,12 +22,12 @@ const usePrintLabel = (
 
       if (!participant.is_reach_the_dinner) {
         await axios.patch(
-          `http://localhost:8000/person/seat/${participant.id || participant._id}`,
+          `http://${HOST}:8000/person/seat/${participant.id || participant._id}`,
           { table_id: tableId }
         );
       }
 
-      await axios.post("http://localhost:8000/print/print_sticker", {
+      await axios.post(`http://${HOST}:8000/print/print_sticker`, {
         full_name: participant.name,
         gender: participant.gender,
         table_number: participant.table_number,

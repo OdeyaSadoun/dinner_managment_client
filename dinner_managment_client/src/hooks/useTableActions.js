@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { HOST } from "../config";
 
 const useTableActions = (setTables, fetchTables) => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -55,7 +56,7 @@ const useTableActions = (setTables, fetchTables) => {
       };
 
       const response = await axios.put(
-        `http://localhost:8000/table/${selectedTable.id}`,
+        `http://${HOST}:8000/table/${selectedTable.id}`,
         updatedTable,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -123,7 +124,7 @@ const useTableActions = (setTables, fetchTables) => {
       if (!token) throw new Error("Token not found. Please login again.");
 
       const response = await axios.post(
-        "http://localhost:8000/table",
+        "http://${HOST}:8000/table",
         newTable,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -172,7 +173,7 @@ const useTableActions = (setTables, fetchTables) => {
       if (!token) throw new Error("No authentication token found");
 
       const response = await axios.patch(
-        `http://localhost:8000/table/delete/${tableToDelete}`,
+        `http://${HOST}:8000/table/delete/${tableToDelete}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },

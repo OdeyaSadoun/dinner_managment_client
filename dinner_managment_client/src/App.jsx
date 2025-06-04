@@ -10,6 +10,7 @@ import Footer from "./components/layouts/Footer";
 import { Box } from "@mui/material";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { HOST } from "./config";
 
 export default function App() {
   const [user, setUser] = useState("");
@@ -69,7 +70,7 @@ export default function App() {
   const updateTables = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8000/table", {
+      const response = await axios.get(`http://${HOST}:8000/table`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.status === "success" && Array.isArray(response.data.data.tables)) {

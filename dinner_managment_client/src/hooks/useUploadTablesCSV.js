@@ -2,6 +2,7 @@
 import { useSnackbar } from "notistack";
 import axios from "axios";
 import { useState } from "react";
+import { HOST } from "../config";
 
 const useUploadTablesCsv = (setTables, fetchTables) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -17,7 +18,7 @@ const useUploadTablesCsv = (setTables, fetchTables) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:8000/table/import_csv",
+        `http://${HOST}:8000/table/import_csv`,
         formData,
         {
           headers: {

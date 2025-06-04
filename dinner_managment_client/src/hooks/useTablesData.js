@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { HOST } from "../config";
 
 const useTablesData = () => {
   const [tables, setTables] = useState([]);
 
   const fetchTables = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/table");
+      const response = await axios.get(`http://${HOST}:8000/table`);
       console.log(response.data);
       
       if (response.data.status === "success" && Array.isArray(response.data.data.tables)) {

@@ -18,6 +18,7 @@ import SearchBar from "../components/layouts/SearchBar";
 import DeleteDialog from "../components/dialogs/DeleteDialog";
 import isAdmin from "../utils/auth";
 import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import { HOST } from "../config";
 
 
 export default function UsersView() {
@@ -46,7 +47,7 @@ export default function UsersView() {
         console.log(isAdmin());
 
 
-        const response = await axios.get("http://localhost:8000/auth/get_all_users",
+        const response = await axios.get(`http://${HOST}:8000/auth/get_all_users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -99,7 +100,7 @@ export default function UsersView() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:8000/auth/register",
+        `http://${HOST}:8000/auth/register`,
         newUser,
         {
           headers: {
@@ -131,7 +132,7 @@ export default function UsersView() {
     if (!userToDelete) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.patch(`http://localhost:8000/auth/delete_user/${userToDelete.id}`, {}, {
+      await axios.patch(`http://${HOST}:8000/auth/delete_user/${userToDelete.id}`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -156,7 +157,7 @@ export default function UsersView() {
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(`http://localhost:8000/auth/update_user/${newUser.id}`, newUser, {
+      const response = await axios.put(`http://${HOST}:8000/auth/update_user/${newUser.id}`, newUser, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

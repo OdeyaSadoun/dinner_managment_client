@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import { useSnackbar } from "notistack";
+import { HOST } from "../config";
 
 const useParticipantActions = (
   setParticipants,
@@ -34,7 +35,7 @@ const useParticipantActions = (
     console.log("⏬ התחלת הורדה של כל המשתתפים");
 
     axios
-      .get("http://localhost:8000/person") // הנחה: זה מביא את כל האנשים
+      .get(`http://${HOST}:8000/person`) // הנחה: זה מביא את כל האנשים
       .then((response) => {
         console.log("📦 תגובת שרת:", response.data);
 
@@ -86,7 +87,7 @@ const useParticipantActions = (
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/person/import_csv",
+        `http://${HOST}:8000/person/import_csv`,
         formData,
         {
           headers: {
@@ -140,7 +141,7 @@ const useParticipantActions = (
       };
 
       const response = await axios.post(
-        "http://localhost:8000/person",
+        `http://${HOST}:8000/person`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -202,7 +203,7 @@ const useParticipantActions = (
           newParticipant.original_is_reach_the_dinner ?? null,
       };
       const response = await axios.put(
-        `http://localhost:8000/person/${newParticipant.id}`,
+        `http://${HOST}:8000/person/${newParticipant.id}`,
         sanitizedParticipant,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -239,7 +240,7 @@ const useParticipantActions = (
       const reachToDinner = participant?.is_reach_the_dinner;
 
       await axios.patch(
-        `http://localhost:8000/person/delete/${participantToDelete}`,
+        `http://${HOST}:8000/person/delete/${participantToDelete}`,
         { table_number: tableNumber, is_reach_the_dinner: reachToDinner }, // 👈 שולחים את מספר השולחן
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -295,14 +296,14 @@ const useParticipantActions = (
       if (tableId) {
         if (updatedParticipant.is_reach_the_dinner) {
           await axios.patch(
-            `http://localhost:8000/person/seat/${participant.id}`,
+            `http://${HOST}:8000/person/seat/${participant.id}`,
             {
               table_id: tableId,
             }
           );
         } else {
           await axios.patch(
-            `http://localhost:8000/person/unseat/${participant.id}`,
+            `http://${HOST}:8000/person/unseat/${participant.id}`,
             {
               table_id: tableId,
             }

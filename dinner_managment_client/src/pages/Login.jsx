@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { TextField, Button, Container, Box, Typography, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { HOST } from "../config";
 
 export default function Login({ setUser }) {
   const [username, setUsername] = useState("");
@@ -11,7 +12,7 @@ export default function Login({ setUser }) {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:8000/auth/login", {
+      const response = await axios.post(`http://${HOST}:8000/auth/login`, {
         username,
         password,
       });

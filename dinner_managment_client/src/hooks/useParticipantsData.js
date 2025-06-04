@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { HOST } from "../config";
 
 const useParticipantsData = () => {
   const [participants, setParticipants] = useState([]);
@@ -12,7 +13,7 @@ const useParticipantsData = () => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const tableRes = await axios.get("http://localhost:8000/table");
+      const tableRes = await axios.get(`http://${HOST}:8000/table`);
       if (
         tableRes.data.status === "success" &&
         Array.isArray(tableRes.data.data.tables)
@@ -26,7 +27,7 @@ const useParticipantsData = () => {
         }, {});
         setTableMapping(mapping);
       }
-      const peopleRes = await axios.get("http://localhost:8000/person");
+      const peopleRes = await axios.get(`http://${HOST}:8000/person`);
       if (
         peopleRes.data.status === "success" &&
         Array.isArray(peopleRes.data.data.people)

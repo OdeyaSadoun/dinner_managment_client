@@ -8,6 +8,7 @@ import axios from "axios";
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap'; // איקון לאיפוס זום
+import { HOST } from "../../config";
 
 
 const TablesLayout = ({
@@ -58,7 +59,7 @@ const TablesLayout = ({
             const token = localStorage.getItem("token"); // או מאיפה שאת שומרת אותו
 
             // שליחה לשרת
-            const response = await axios.put(`http://localhost:8000/table/${table.id}`, updatedTable, {
+            const response = await axios.put(`http://${HOST}:8000/table/${table.id}`, updatedTable, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
