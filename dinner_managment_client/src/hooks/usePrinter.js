@@ -27,10 +27,19 @@ const usePrintLabel = (
         );
       }
 
+      let clientPort = localStorage.getItem("client_print_port");
+      console.log(clientPort);
+
+      if(!clientPort){
+        clientPort = ""
+      }
+      
+      
       await axios.post(`http://${HOST}:8000/print/print_sticker`, {
         full_name: participant.name,
         gender: participant.gender,
         table_number: participant.table_number,
+        client_port: clientPort
       });
 
       await fetchParticipants();

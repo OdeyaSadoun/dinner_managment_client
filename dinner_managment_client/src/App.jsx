@@ -18,6 +18,15 @@ export default function App() {
   const [authChecked, setAuthChecked] = useState(false); // חדש
   const [tables, setTables] = useState([]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const port = params.get("set_client_port");
+    if (port) {
+      localStorage.setItem("client_print_port", port);
+      console.log("port save", port);
+      
+    }
+  }, [])
   const isTokenExpired = (token) => {
     if (!token) return true;
     try {
